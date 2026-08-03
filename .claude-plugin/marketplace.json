@@ -1,0 +1,16 @@
+{
+  "name": "stayapi",
+  "description": "Official StayAPI skills — live hotel, vacation-rental, and restaurant data for AI assistants.",
+  "owner": {
+    "name": "StayAPI",
+    "email": "info@stayapi.com",
+    "url": "https://stayapi.com"
+  },
+  "plugins": [
+    {
+      "name": "stayapi",
+      "source": "./",
+      "description": "Live hotel, vacation-rental, and restaurant data from Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor, Radisson, and OpenTable through StayAPI."
+    }
+  ]
+}

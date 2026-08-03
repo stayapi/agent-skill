@@ -1,0 +1,25 @@
+{
+  "name": "stayapi",
+  "description": "Live hotel, vacation-rental, and restaurant data from Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor, Radisson, and OpenTable through StayAPI — search, details, rooms, photos, reviews, and availability.",
+  "version": "0.1.0",
+  "author": {
+    "name": "StayAPI",
+    "email": "info@stayapi.com",
+    "url": "https://stayapi.com"
+  },
+  "homepage": "https://stayapi.com",
+  "repository": "https://github.com/stayapi/agent-skill",
+  "license": "MIT",
+  "keywords": [
+    "hotels",
+    "travel",
+    "booking",
+    "airbnb",
+    "tripadvisor",
+    "reviews",
+    "restaurants",
+    "opentable",
+    "mcp",
+    "api"
+  ]
+}
