@@ -1,13 +1,13 @@
 ---
 name: stayapi
-description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor, Radisson, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
+description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor, Radisson, WeHotel (Jin Jiang), and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.0
+  version: 0.1.1
 ---
 
 # StayAPI — Live Hotel & Travel Data
 
-StayAPI is a hosted API that returns live, structured data from the major travel platforms: Booking.com, Airbnb, Google Hotels / Google Travel / Google Reviews, TripAdvisor, Agoda, Trip.com, Accor (ALL), Radisson, and OpenTable. One successful data call costs one quota unit, on any platform, over either transport.
+StayAPI is a hosted API that returns live, structured data from the major travel platforms: Booking.com, Airbnb, Google Hotels / Google Travel / Google Reviews, TripAdvisor, Agoda, Trip.com, Accor (ALL), Radisson, WeHotel (Jin Jiang), and OpenTable. One successful data call costs one quota unit, on any platform, over either transport.
 
 Canonical links:
 
@@ -57,7 +57,7 @@ Most tools take a platform-native ID, and there is a resolver for whatever the u
 | Place name (Google Reviews) | `google_reviews_for_place` with `query` | first page + `data_id` to paginate with |
 | Place name → coordinates | `meta_coordinates_lookup` | `latitude`/`longitude` for OpenTable and Accor search |
 | TripAdvisor place name / URL | `tripadvisor_geo_search` / pass URL directly | `geo_id` / `location_id` |
-| Agoda, Radisson, OpenTable URL | the platform's dedicated `*_url_to_id` tool | numeric ID for that platform's other tools |
+| Agoda, Radisson, OpenTable, WeHotel URL | the platform's dedicated `*_url_to_id` tool | platform ID for that platform's other tools |
 
 ## Core workflows
 
@@ -70,7 +70,7 @@ The six flows below cover most requests; [references/workflows.md](references/wo
 5. **Google reviews for a place**: name or `data_id` → Google reviews with pagination.
 6. **Airbnb listing details & reviews**: any Airbnb URL or `listing_id` → details (dates required) and reviews.
 
-Everything beyond these — TripAdvisor, Google Travel deep-dives, Accor, Radisson, OpenTable, Agoda, Trip.com, room-level rates, price calendars, private dining — is cataloged in [references/tools.md](references/tools.md): all 55 MCP tools with their REST equivalents and per-platform gotchas. Read it whenever a request goes beyond the six core flows.
+Everything beyond these — TripAdvisor, Google Travel deep-dives, Accor, Radisson, WeHotel (Jin Jiang), OpenTable, Agoda, Trip.com, room-level rates, price calendars, private dining — is cataloged in [references/tools.md](references/tools.md): every MCP tool with its REST equivalent and per-platform gotchas. Read it whenever a request goes beyond the six core flows.
 
 ## Errors and backoff
 
@@ -90,6 +90,6 @@ Transient upstream errors (`upstream_error`, HTTP 502/503) are usually worth one
 - **Booking search prices are stay totals, not nightly rates**, and hotel rows nest at `data.hotels` (the envelope's top-level `hotel_id` is null on search). Results come in Booking's "recommended" ranking — there is no sort parameter, so "top by price/rating" means over-fetch and sort client-side.
 - **Sort parameter names differ per platform** — Booking `sort=recent_desc`, Airbnb `sort_by=MOST_RECENT`, Google reviews `sort_by=newest`, Agoda `sorting=7`. Check the workflow/catalog reference before assuming; the default is usually relevance, which silently fails "most recent" requests.
 - **Airbnb details require `check_in` and `check_out`**; pick near-future dates if the user doesn't care.
-- **Page-size caps**: Booking reviews 25/page · Airbnb reviews 50/page · Agoda 20/page · OpenTable 25/page · Accor reviews capped at 20 total (upstream limit).
+- **Page-size caps**: Booking reviews 25/page · Airbnb reviews 50/page · Agoda 20/page · OpenTable 25/page · WeHotel 20/page · Accor reviews capped at 20 total (upstream limit).
 - **`airbnb_search_listings` is a stub** — Airbnb search by location isn't built yet; the tool returns `feature_unavailable` (not billed). Offer Booking, Google Hotels, or TripAdvisor search instead.
 - **Trip.com reviews are slow by design** (a real browser defeats bot detection) — expect several seconds per page and keep `page_size` generous to minimize calls.

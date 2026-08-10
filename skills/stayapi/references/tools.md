@@ -10,6 +10,7 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 - [TripAdvisor](#tripadvisor)
 - [Accor (ALL)](#accor-all)
 - [Radisson](#radisson)
+- [WeHotel (Jin Jiang)](#wehotel-jin-jiang)
 - [OpenTable](#opentable)
 - [Agoda](#agoda) · [Trip.com](#tripcom) · [Meta (geocoding)](#meta-geocoding)
 - [URL vs ID — which to pass](#url-vs-id--which-to-pass)
@@ -113,6 +114,18 @@ Covers Sofitel, Fairmont, Novotel, Ibis, and other Accor brands. Search takes `l
 | `radisson_hotel_rates` | `GET /v1/radisson/hotel/rates` | Live lowest cash rate for one stay, optional member rates. |
 | `radisson_hotel_room_rates` | `GET /v1/radisson/hotel/room-rates` | Exact live room groups with prices and booking conditions. |
 
+## WeHotel (Jin Jiang)
+
+Jin Jiang, Metropolo, Campanile, Golden Tulip, Lavande, Vienna, 7 Days, and other WeHotel brands. Search takes a WeHotel city code (e.g. `AR04567` for Shanghai) plus stay dates; everything else keys off the `property_id` a search row or URL resolution returns.
+
+| MCP tool | REST | What it does |
+|---|---|---|
+| `bestwe_search_hotels` | `GET /v1/bestwe/search` | Dated city search → properties with lowest advertised nightly price and `property_id`. Optional lat/lng center; `sort`: `recommended`/`distance`/`price_asc`/`price_desc`; ≤20/page. |
+| `bestwe_hotel_url_to_id` | `GET /v1/bestwe/hotel/url-to-id` | Canonical `hotel.bestwehotel.com` HotelDetail URL → `property_id`. |
+| `bestwe_hotel_details` | `GET /v1/bestwe/hotel/details` | Property content: policies, photos, facilities, room metadata. |
+| `bestwe_hotel_reviews` | `GET /v1/bestwe/hotel/reviews` | Paginated guest reviews with scores, photos, tags, and hotel replies (≤20/page). |
+| `bestwe_hotel_rooms` | `GET /v1/bestwe/hotel/rooms` | Dated room types with public and member rates and cancellation rules. |
+
 ## OpenTable
 
 Restaurant data. Search is coordinate-based — resolve place names with `meta_coordinates_lookup` first.
@@ -154,7 +167,7 @@ Restaurant data. Search is coordinate-based — resolve place names with `meta_c
 
 - **ID always wins** when you have one: no resolution step, no extra latency or quota.
 - Booking, Airbnb, and TripAdvisor single-item tools accept `url` directly. Airbnb and TripAdvisor URL parsing is instant; **Booking URL resolution takes 5–40 s** (real browser).
-- Radisson, OpenTable, and Agoda keep resolution explicit: call their `*_url_to_id` tool once, then use the id everywhere. Agoda's resolver costs a quota unit; OpenTable's is fast (no browser).
+- Radisson, OpenTable, Agoda, and WeHotel keep resolution explicit: call their `*_url_to_id` tool once, then use the id everywhere. Agoda's resolver costs a quota unit; OpenTable's is fast (no browser).
 - Cache every resolved id for the rest of the session — they're stable.
 
 ## Quota, billing, and errors

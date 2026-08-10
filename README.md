@@ -1,6 +1,6 @@
 # StayAPI Agent Skill
 
-An [agent skill](https://docs.claude.com/en/docs/claude-code/skills) that teaches AI assistants to fetch **live hotel, vacation-rental, and restaurant data** through [StayAPI](https://stayapi.com): Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor (ALL), Radisson, and OpenTable.
+An [agent skill](https://docs.claude.com/en/docs/claude-code/skills) that teaches AI assistants to fetch **live hotel, vacation-rental, and restaurant data** through [StayAPI](https://stayapi.com): Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor (ALL), Radisson, WeHotel (Jin Jiang), and OpenTable.
 
 With the skill installed, prompts like these just work:
 
