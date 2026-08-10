@@ -150,7 +150,7 @@ Details that matter for review requests:
 
 Airbnb URL→ID is an instant regex — passing a URL costs nothing extra.
 
-**MCP**: `airbnb_listing_details(url="https://www.airbnb.com/rooms/33571268", check_in=..., check_out=...)` · `airbnb_listing_reviews(listing_id=33571268, sort_by="MOST_RECENT")`
+**MCP**: `airbnb_listing_details(url="https://www.airbnb.com/rooms/22120898", check_in=..., check_out=...)` · `airbnb_listing_reviews(listing_id=22120898, sort_by="MOST_RECENT")`
 
 **REST**:
 
@@ -158,14 +158,14 @@ Airbnb URL→ID is an instant regex — passing a URL costs nothing extra.
 # Details — check_in/check_out are REQUIRED (pricing is date-dependent); pick near-future
 # dates if the user doesn't care:
 curl -sS "${AUTH[@]}" --get "$BASE/v1/airbnb/listing/details-from-url" \
-  --data-urlencode "url=https://www.airbnb.com/rooms/33571268" \
+  --data-urlencode "url=https://www.airbnb.com/rooms/22120898" \
   -d check_in=2026-09-11 -d check_out=2026-09-13 -d adults=2 -d currency=USD
 
-# Same by id: $BASE/v1/airbnb/listing/33571268/details?check_in=...&check_out=...
+# Same by id: $BASE/v1/airbnb/listing/22120898/details?check_in=...&check_out=...
 
 # Reviews — limit up to 50/page, offset-paginated:
 curl -sS "${AUTH[@]}" \
-  "$BASE/v1/airbnb/listing/reviews/33571268?limit=50&offset=0&sort_by=MOST_RECENT"
+  "$BASE/v1/airbnb/listing/reviews/22120898?limit=50&offset=0&sort_by=MOST_RECENT"
 ```
 
 - `sort_by`: `BEST_QUALITY` (default) or `MOST_RECENT` — use `MOST_RECENT` for backfills, same stop-at-cutoff pattern as Booking.
