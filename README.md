@@ -45,7 +45,7 @@ skills/stayapi/
 └── references/
     ├── workflows.md          # worked examples: destination lookup, search, details, reviews,
     │                         # Google Hotels, Airbnb — MCP sequences + copy-paste REST curl
-    └── tools.md              # full catalog: 55 MCP tools ↔ REST endpoints across 14 platforms
+    └── tools.md              # full catalog: 61 MCP tools ↔ REST endpoints across 14 platforms
 ```
 
 The skill contains documentation only — all data comes from your StayAPI account, billed one quota unit per successful call, same as the REST API.

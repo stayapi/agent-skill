@@ -31,7 +31,7 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 | `booking_hotel_photos` | `GET /v2/booking/hotel/photos?hotel_id=` | Full gallery; signed URLs at three sizes. Never rebuild photo URLs from ids. |
 | — | `GET /v1/booking/hotel/url-to-id?url=` | Canonical hotel URL → numeric `hotel_id`. Real-browser fetch: 5–40 s; cache the result. |
 
-REST additionally exposes `hotel/reviews/summary`, `hotel/reviews/scores`, `hotel/facilities`, `hotel/prices`, and `search_by_url` — see https://stayapi.com/docs.
+REST additionally exposes `hotel/reviews/summary`, `hotel/reviews/scores`, `hotel/facilities`, `hotel/prices`, and `search_by_url` — see https://stayapi.com/docs. The three REST review endpoints return empty success data for valid zero-review hotels and `NOT_FOUND` for nonexistent IDs.
 
 Canonical URL shape (anything else is a 400): `https://www.booking.com/hotel/{cc}/{slug}.html`
 
@@ -146,6 +146,7 @@ Restaurant data. Search is coordinate-based — resolve place names with `meta_c
 | MCP tool | REST | What it does |
 |---|---|---|
 | `agoda_hotel_url_to_id` | `GET /v1/agoda/hotel/url-to-id` | Agoda hotel URL → numeric `hotel_id`. Costs one quota unit (real page fetch) — cache the id. First step. |
+| `agoda_hotel_prices` | `GET /v1/agoda/hotel/prices` | Live dated room availability, lowest whole-stay price, per-night/stay tax breakdowns, breakfast, cancellation, and inventory. A sold-out stay is a successful empty result. |
 | `agoda_hotel_reviews` | `GET /v1/agoda/hotel/reviews/{hotel_id}` | Reviews aggregated across every provider Agoda syndicates. 20/page; `sorting`: `7` recent (default), `6` highest, `5` lowest. |
 | `agoda_hotel_review_comments` | `GET /v1/agoda/hotel/reviews/{hotel_id}/comments` | Same shape, one provider only — `provider_id` defaults to `3038` (Agoda's own). |
 
