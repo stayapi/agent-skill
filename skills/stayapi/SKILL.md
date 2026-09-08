@@ -1,13 +1,13 @@
 ---
 name: stayapi
-description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor, Radisson, WeHotel (Jin Jiang), and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
+description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor, Radisson, Marriott Bonvoy, WeHotel (Jin Jiang), and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.4
+  version: 0.1.5
 ---
 
 # StayAPI — Live Hotel & Travel Data
 
-StayAPI is a hosted API that returns live, structured data from the major travel platforms: Booking.com, Airbnb, Google Hotels / Google Travel / Google Reviews, TripAdvisor, Agoda, Trip.com, Accor (ALL), Radisson, WeHotel (Jin Jiang), and OpenTable. One successful data call costs one quota unit, on any platform, over either transport.
+StayAPI is a hosted API that returns live, structured data from the major travel platforms: Booking.com, Airbnb, Google Hotels / Google Travel / Google Reviews, TripAdvisor, Agoda, Trip.com, Accor (ALL), Radisson, Marriott Bonvoy, WeHotel (Jin Jiang), and OpenTable. One successful data call costs one quota unit, on any platform, over either transport.
 
 Canonical links:
 
@@ -58,6 +58,7 @@ Most tools take a platform-native ID, and there is a resolver for whatever the u
 | Place name → coordinates | `meta_coordinates_lookup` | `latitude`/`longitude` for OpenTable and Accor search |
 | TripAdvisor place name / URL | `tripadvisor_geo_search` / pass URL directly | `geo_id` / `location_id` |
 | Agoda, Radisson, OpenTable, WeHotel URL | the platform's dedicated `*_url_to_id` tool | platform ID for that platform's other tools |
+| Marriott property (no URL resolver) | `marriott_bonvoy_search` by coordinates (`meta_coordinates_lookup` first if you only have a place name) | `property_id` code for `marriott_bonvoy_rooms` |
 
 ## Core workflows
 
@@ -70,7 +71,7 @@ The six flows below cover most requests; [references/workflows.md](references/wo
 5. **Google reviews for a place**: name or `data_id` → Google reviews with pagination.
 6. **Airbnb listing details & reviews**: any Airbnb URL or `listing_id` → details (dates required) and reviews.
 
-Everything beyond these — TripAdvisor, Google Travel deep-dives, Accor, Radisson, WeHotel (Jin Jiang), OpenTable, Agoda, Trip.com, room-level rates, price calendars, private dining — is cataloged in [references/tools.md](references/tools.md): every MCP tool with its REST equivalent and per-platform gotchas. Read it whenever a request goes beyond the six core flows.
+Everything beyond these — TripAdvisor, Google Travel deep-dives, Accor, Radisson, Marriott Bonvoy, WeHotel (Jin Jiang), OpenTable, Agoda, Trip.com, room-level rates, price calendars, private dining — is cataloged in [references/tools.md](references/tools.md): every MCP tool with its REST equivalent and per-platform gotchas. Read it whenever a request goes beyond the six core flows.
 
 ## Errors and backoff
 

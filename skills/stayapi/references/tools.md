@@ -10,6 +10,7 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 - [TripAdvisor](#tripadvisor)
 - [Accor (ALL)](#accor-all)
 - [Radisson](#radisson)
+- [Marriott Bonvoy](#marriott-bonvoy)
 - [WeHotel (Jin Jiang)](#wehotel-jin-jiang)
 - [OpenTable](#opentable)
 - [Agoda](#agoda) · [Trip.com](#tripcom) · [Meta (geocoding)](#meta-geocoding)
@@ -113,6 +114,15 @@ Covers Sofitel, Fairmont, Novotel, Ibis, and other Accor brands. Search takes `l
 | `radisson_price_calendar` | `GET /v1/radisson/hotel/price-calendar` | Public lowest-price calendar, up to 60 days. |
 | `radisson_hotel_rates` | `GET /v1/radisson/hotel/rates` | Live lowest cash rate for one stay, optional member rates. |
 | `radisson_hotel_room_rates` | `GET /v1/radisson/hotel/room-rates` | Exact live room groups with prices and booking conditions. |
+
+## Marriott Bonvoy
+
+Brand.com search and live room rates with Bonvoy award pricing. No URL resolver: `marriott_bonvoy_search` returns the `property_id` codes (e.g. `NYCXR`) that `marriott_bonvoy_rooms` takes.
+
+| MCP tool | REST | What it does |
+|---|---|---|
+| `marriott_bonvoy_search` | `GET /v1/marriott/bonvoy/search` | Properties near `latitude`/`longitude` for a stay: `property_id`, brand, rating, distance, lowest cash price, `points_per_night`. 20/page via `offset`; `sort_by` `DISTANCE` or `PRICE`; optional `corporate_code`. |
+| `marriott_bonvoy_rooms` | `GET /v1/marriott/bonvoy/rooms` | Room types and rate plans for one `property_id` and stay, cash and award. **`points` and `per_night` are the check-in night only** — use `points_total` (whole stay, matches marriott.com) or `total` (cash incl. taxes/fees), or sum `nightly_rates` (one `{date, cash, points, free_night}` per night). A room can list several award plans at different prices; key on `rate_plan_code`. |
 
 ## WeHotel (Jin Jiang)
 
