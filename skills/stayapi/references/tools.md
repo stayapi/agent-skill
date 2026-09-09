@@ -12,6 +12,7 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 - [Radisson](#radisson)
 - [Marriott Bonvoy](#marriott-bonvoy)
 - [WeHotel (Jin Jiang)](#wehotel-jin-jiang)
+- [MakeMyTrip India](#makemytrip-india)
 - [OpenTable](#opentable)
 - [Agoda](#agoda) · [Trip.com](#tripcom) · [Meta (geocoding)](#meta-geocoding)
 - [URL vs ID — which to pass](#url-vs-id--which-to-pass)
@@ -135,6 +136,16 @@ Jin Jiang, Metropolo, Campanile, Golden Tulip, Lavande, Vienna, 7 Days, and othe
 | `bestwe_hotel_details` | `GET /v1/bestwe/hotel/details` | Property content: policies, photos, facilities, room metadata. |
 | `bestwe_hotel_reviews` | `GET /v1/bestwe/hotel/reviews` | Paginated guest reviews with scores, photos, tags, and hotel replies (≤20/page). |
 | `bestwe_hotel_rooms` | `GET /v1/bestwe/hotel/rooms` | Dated room types with public and member rates and cancellation rules. |
+
+## MakeMyTrip India
+
+Use a MakeMyTrip city code and dated stay for search. Search returns the numeric `hotel_id` for details and reviews. Prices are INR listing prices; prefer the tax-and-fee-inclusive amount when the response provides it. Room inventory is not yet available.
+
+| MCP tool | REST | What it does |
+|---|---|---|
+| `makemytrip_search_hotels` | `GET /v1/makemytrip/search` | Dated India city search. Takes `city_code`, future check-in/check-out, adults, one room, optional child ages, limit, and an opaque cursor. Reuse a cursor only with identical search inputs and limit. |
+| `makemytrip_get_hotel_details` | `GET /v1/makemytrip/hotel/details` | Hotel description, amenities, location, and public photos by numeric `hotel_id` and stay. |
+| `makemytrip_get_hotel_reviews` | `GET /v1/makemytrip/hotel/reviews` | Reviews by numeric `hotel_id`; start with `next_ota=MMT` and continue only while `source_changed` is false and `next_start` is present. |
 
 ## OpenTable
 

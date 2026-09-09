@@ -1,6 +1,6 @@
 # StayAPI Agent Skill
 
-An [agent skill](https://docs.claude.com/en/docs/claude-code/skills) that teaches AI assistants to fetch **live hotel, vacation-rental, and restaurant data** through [StayAPI](https://stayapi.com): Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor (ALL), Radisson, Marriott Bonvoy, WeHotel (Jin Jiang), and OpenTable.
+An [agent skill](https://docs.claude.com/en/docs/claude-code/skills) that teaches AI assistants to fetch **live hotel, vacation-rental, and restaurant data** through [StayAPI](https://stayapi.com): Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor (ALL), Radisson, Marriott Bonvoy, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable.
 
 With the skill installed, prompts like these just work:
 
@@ -45,7 +45,7 @@ skills/stayapi/
 └── references/
     ├── workflows.md          # worked examples: destination lookup, search, details, reviews,
     │                         # Google Hotels, Airbnb — MCP sequences + copy-paste REST curl
-    └── tools.md              # full catalog: 61 MCP tools ↔ REST endpoints across 14 platforms
+    └── tools.md              # full catalog: 66 MCP tools ↔ REST endpoints across 15 platforms
 ```
 
 The skill contains documentation only — all data comes from your StayAPI account, billed one quota unit per successful call, same as the REST API.
