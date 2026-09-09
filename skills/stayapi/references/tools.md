@@ -11,6 +11,7 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 - [Accor (ALL)](#accor-all)
 - [Radisson](#radisson)
 - [Marriott Bonvoy](#marriott-bonvoy)
+- [Hilton](#hilton)
 - [WeHotel (Jin Jiang)](#wehotel-jin-jiang)
 - [MakeMyTrip India](#makemytrip-india)
 - [OpenTable](#opentable)
@@ -124,6 +125,19 @@ Brand.com search and live room rates with Bonvoy award pricing. No URL resolver:
 |---|---|---|
 | `marriott_bonvoy_search` | `GET /v1/marriott/bonvoy/search` | Properties near `latitude`/`longitude` for a stay: `property_id`, brand, rating, distance, lowest cash price, `points_per_night`. 20/page via `offset`; `sort_by` `DISTANCE` or `PRICE`; optional `corporate_code`. |
 | `marriott_bonvoy_rooms` | `GET /v1/marriott/bonvoy/rooms` | Room types and rate plans for one `property_id` and stay, cash and award. **`points` and `per_night` are the check-in night only** — use `points_total` (whole stay, matches marriott.com) or `total` (cash incl. taxes/fees), or sum `nightly_rates` (one `{date, cash, points, free_night}` per night). A room can list several award plans at different prices; key on `rate_plan_code`. |
+
+## Hilton
+
+Hilton supports undated property discovery, canonical URL resolution, and dated
+starting cash rates. Search itself returns no cash rates or availability. Rooms
+returns one cash offer per available room type, not full rate-plan or Hilton
+Honors award inventory.
+
+| MCP tool | REST | What it does |
+|---|---|---|
+| `hilton_search` | `GET /v1/hilton/search` | Search by a place query or coordinate pair. Returns a location match and hotel metadata, including a seven-character `hotel_code`; `limit` is 1–150 and defaults to 20. |
+| `hilton_hotel_url_to_id` | `GET /v1/hilton/hotel/url-to-id` | Parse a canonical HTTPS Hilton property or booking URL into its uppercase seven-character `hotel_code`. |
+| `hilton_rooms` | `GET /v1/hilton/rooms` | Dated room types and one starting cash rate each for `hotel_code`; future `check_in`/`check_out`, `adults` 1–4 (default 2), `currency` USD/GBP (default USD). Always one room and no children. `total` is exact upstream stay total, not `per_night × nights`. |
 
 ## WeHotel (Jin Jiang)
 

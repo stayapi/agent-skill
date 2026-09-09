@@ -1,12 +1,13 @@
 # StayAPI Agent Skill
 
-An [agent skill](https://docs.claude.com/en/docs/claude-code/skills) that teaches AI assistants to fetch **live hotel, vacation-rental, and restaurant data** through [StayAPI](https://stayapi.com): Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor (ALL), Radisson, Marriott Bonvoy, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable.
+An [agent skill](https://docs.claude.com/en/docs/claude-code/skills) that teaches AI assistants to fetch **live hotel, vacation-rental, and restaurant data** through [StayAPI](https://stayapi.com): Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor (ALL), Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable.
 
 With the skill installed, prompts like these just work:
 
 > *"Find the top hotels in Lisbon for Sep 11–13 with prices"*
 > *"Get the 20 most recent guest reviews for this Booking.com hotel"*
 > *"What do Google reviews say about the Bellagio?"*
+> *"Find Hilton hotels in London and get starting cash room rates for my dates"*
 > *"Which OpenTable restaurants near the Eiffel Tower have a table for 4 tonight?"*
 
 The skill guides the assistant to the right StayAPI capability — over the [MCP server](https://stayapi.com/docs/mcp) when connected, or the plain REST API otherwise — and encodes the gotchas that trip up agents (signed destination IDs, stay-total vs nightly prices, per-platform sort parameters, URL-vs-ID resolution costs).
@@ -45,7 +46,7 @@ skills/stayapi/
 └── references/
     ├── workflows.md          # worked examples: destination lookup, search, details, reviews,
     │                         # Google Hotels, Airbnb — MCP sequences + copy-paste REST curl
-    └── tools.md              # full catalog: 66 MCP tools ↔ REST endpoints across 15 platforms
+    └── tools.md              # full MCP tool catalog and corresponding REST endpoints
 ```
 
 The skill contains documentation only — all data comes from your StayAPI account, billed one quota unit per successful call, same as the REST API.
