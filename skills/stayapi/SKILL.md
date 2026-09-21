@@ -2,12 +2,12 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.8
+  version: 0.1.9
 ---
 
 # StayAPI — Live Hotel & Travel Data
 
-StayAPI is a hosted API that returns live, structured data from the major travel platforms: Booking.com, Airbnb, Google Hotels / Google Travel / Google Reviews, TripAdvisor, Agoda, Trip.com, Accor (ALL), Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable. One successful data call costs one quota unit, on any platform, over either transport.
+StayAPI is a hosted API that returns live, structured data from the major travel platforms: Booking.com, Airbnb, Google Hotels / Google Travel / Google Reviews, TripAdvisor, Agoda, Trip.com, Accor (ALL), Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable. One successful data call or definitive business negative costs one quota unit, on any platform, over either transport. MCP input/provider/protocol failures do not consume quota.
 
 Canonical links:
 
@@ -78,7 +78,7 @@ Everything beyond these — TripAdvisor, Google Travel deep-dives, Accor, Radiss
 
 REST errors are RFC 7807 `application/problem+json`; MCP tools return structured error dicts (`invalid_input`, `url_resolution_failed`, `upstream_error`, `no_results`, `rate_limited`, `quota_exhausted`, `feature_unavailable`). Two rules matter:
 
-- **A 2xx status is the only success signal.** Never parse an error body as data.
+- **Check the tool outcome.** REST uses HTTP status; MCP may carry `isError`, JSON-RPC errors, or a structured helper error inside HTTP 200. Never parse an error as data. MCP invalid-input/provider/protocol failures release the reserved credit; definitive `no_results` remains billable.
 - **Respect `retry_after`.** `rate_limited` means back off briefly and retry once or twice. `quota_exhausted` includes `retry_after` and `reset_at` — the monthly quota is gone, so stop calling and tell the user when it resets (or suggest upgrading); retrying in a loop only burns time.
 
 Transient upstream errors (`upstream_error`, HTTP 502/503) are usually worth one retry after a few seconds — these are live scrapes of third-party sites, not a static database.
