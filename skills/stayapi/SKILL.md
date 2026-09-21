@@ -2,7 +2,7 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.7
+  version: 0.1.8
 ---
 
 # StayAPI — Live Hotel & Travel Data
@@ -59,7 +59,7 @@ Most tools take a platform-native ID, and there is a resolver for whatever the u
 | TripAdvisor place name / URL | `tripadvisor_geo_search` / pass URL directly | `geo_id` / `location_id` |
 | Agoda, Radisson, OpenTable, WeHotel URL | the platform's dedicated `*_url_to_id` tool | platform ID for that platform's other tools |
 | Marriott property (no URL resolver) | `marriott_bonvoy_search` by coordinates (`meta_coordinates_lookup` first if you only have a place name) | `property_id` code for `marriott_bonvoy_rooms` |
-| Hilton property URL or place | `hilton_hotel_url_to_id` or `hilton_search` | seven-character `hotel_code`; use `hilton_rooms` for dated starting cash rates |
+| Hilton property URL or place | `hilton_hotel_url_to_id` or `hilton_search` | seven-character `hotel_code`; use `hilton_rooms` for dated starting cash rates and full-points rewards |
 
 ## Core workflows
 

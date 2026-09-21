@@ -18,7 +18,7 @@ Dates in examples are placeholders — always use dates in the future, and pass 
 4. [Google Hotels search](#4-google-hotels-search)
 5. [Google reviews for a place](#5-google-reviews-for-a-place)
 6. [Airbnb listing details & reviews](#6-airbnb-listing-details--reviews)
-7. [Hilton property → dated starting cash rates](#7-hilton-property--dated-starting-cash-rates)
+7. [Hilton property → dated cash and full-points rewards](#7-hilton-property--dated-cash-and-full-points-rewards)
 
 ---
 
@@ -173,12 +173,12 @@ curl -sS "${AUTH[@]}" \
 - REST also exposes per-listing `pricing`, `calendar`, `cancellation-policy`, and `payment-methods` (same `/v1/airbnb/listing/…` shape) — see https://stayapi.com/docs.
 - **No Airbnb search by location** — `airbnb_search_listings` is an unbilled stub. For "find me an Airbnb in X", search Booking / Google Hotels instead and say why.
 
-## 7. Hilton property → dated starting cash rates
+## 7. Hilton property → dated cash and full-points rewards
 
 Resolve a Hilton URL or search a place, then pass the seven-character
 `hotel_code` to dated rooms. The rooms call has a fixed search party: one room,
-no children, and 1–4 adults. It returns one starting cash rate per available
-room type; it is not a full rate-plan or Hilton Honors award search.
+no children, and 1–4 adults. It returns starting cash offers and full-points
+standard/premium reward offers. It does not return all cash plans or Points & Money.
 
 **MCP**: `hilton_hotel_url_to_id(url="https://www.hilton.com/en/hotels/lonhitw-hilton-london-park-lane/")` → `hilton_rooms(hotel_code="LONHITW", check_in="2027-11-12", check_out="2027-11-15", adults=2, currency="GBP")`
 
@@ -194,4 +194,8 @@ curl -sS "${AUTH[@]}" "$BASE/v1/hilton/rooms?hotel_code=LONHITW\
 upstream stay total; do not multiply the rounded nightly amount by nights.
 `currency` is the requested display currency, while `native_currency` identifies
 Hilton's source currency. A `pricing_scope` of `starting_rates` confirms the
-single-offer-per-room-type scope.
+cash starting-offer scope. `reward_rates` has explicit `points_total` and dated
+`nightly_rates`; `points` is only the check-in night. Either offer list may be
+empty, but every returned room has a verified offer. `members_only` and
+`login_required` describe booking restrictions; no Hilton login is needed to
+retrieve quotes. Never infer mixed-payment costs or fifth-night benefits.

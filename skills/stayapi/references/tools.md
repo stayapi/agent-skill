@@ -129,15 +129,15 @@ Brand.com search and live room rates with Bonvoy award pricing. No URL resolver:
 ## Hilton
 
 Hilton supports undated property discovery, canonical URL resolution, and dated
-starting cash rates. Search itself returns no cash rates or availability. Rooms
-returns one cash offer per available room type, not full rate-plan or Hilton
-Honors award inventory.
+starting cash rates plus full-points rewards. Search itself returns no prices or
+availability. Rooms returns up to one starting cash offer plus standard/premium
+reward offers per available room type, not exhaustive cash plans or Points & Money.
 
 | MCP tool | REST | What it does |
 |---|---|---|
 | `hilton_search` | `GET /v1/hilton/search` | Search by a place query or coordinate pair. Returns a location match and hotel metadata, including a seven-character `hotel_code`; `limit` is 1–150 and defaults to 20. |
 | `hilton_hotel_url_to_id` | `GET /v1/hilton/hotel/url-to-id` | Parse a canonical HTTPS Hilton property or booking URL into its uppercase seven-character `hotel_code`. |
-| `hilton_rooms` | `GET /v1/hilton/rooms` | Dated room types and one starting cash rate each for `hotel_code`; future `check_in`/`check_out`, `adults` 1–4 (default 2), `currency` USD/GBP (default USD). Always one room and no children. `total` is exact upstream stay total, not `per_night × nights`. |
+| `hilton_rooms` | `GET /v1/hilton/rooms` | Dated room types with starting cash `rates` and full-points standard/premium `reward_rates` for `hotel_code`; future `check_in`/`check_out`, `adults` 1–4 (default 2), `currency` USD/GBP (default USD). Always one room and no children. `total` is exact upstream cash stay total, not `per_night × nights`. Reward `points` is the check-in night; `points_total` is the stay total with dated `nightly_rates`. Empty rewards means none returned; cash `rates` may be empty for an award-only room. Membership/login flags restrict booking. No Points & Money. |
 
 ## WeHotel (Jin Jiang)
 
