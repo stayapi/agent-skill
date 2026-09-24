@@ -2,7 +2,7 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.10
+  version: 0.1.11
 ---
 
 # StayAPI — Live Hotel & Travel Data
