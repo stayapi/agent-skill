@@ -27,11 +27,11 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 | MCP tool | REST | What it does |
 |---|---|---|
 | `booking_lookup_destination` | `GET /v1/booking/destinations/lookup?query=` | Free-form name → signed `dest_id`. First step before search. Query bare city names. |
-| `booking_search_hotels` | `GET /v1/booking/search?dest_id=` | Hotel list for a destination + stay window. `dest_id` is signed — keep the minus. |
+| `booking_search_hotels` | `GET /v1/booking/search?dest_id=` | Hotel list for a destination + stay window. `dest_id` is signed — keep the minus. `total_results` is Booking's real count; only offsets 0–1000 are served — page via `has_next_page`. |
 | `booking_hotel_details` | `GET /v2/booking/hotel/details?hotel_id=` | Compact one-hotel details. v2 takes `hotel_id` only; resolve URLs first. |
 | `booking_hotel_rooms` | `GET /v1/booking/hotel/rooms?hotel_id=` | Room types + bookable rate blocks, incl. `availability_summary.total_available_rooms`. |
 | `booking_hotel_reviews` | `GET /v1/booking/hotel/reviews?hotel_id=` | Paginated reviews (max 25/page). `sort=recent_desc` for chronological backfill. |
-| `booking_hotel_photos` | `GET /v2/booking/hotel/photos?hotel_id=` | Full gallery; signed URLs at three sizes. Never rebuild photo URLs from ids. |
+| `booking_hotel_photos` | `GET /v2/booking/hotel/photos?hotel_id=` | Full gallery; signed URLs at three sizes. MCP: `limit` (default 20, `0` = all) + `size` to trim; `metadata.photo_count` = full total. Never rebuild photo URLs from ids. |
 | — | `GET /v1/booking/hotel/url-to-id?url=` | Canonical hotel URL → numeric `hotel_id`. Real-browser fetch: 5–40 s; cache the result. |
 
 REST additionally exposes `hotel/reviews/summary`, `hotel/reviews/scores`, `hotel/facilities`, `hotel/prices`, and `search_by_url` — see https://stayapi.com/docs. The three REST review endpoints return empty success data for valid zero-review hotels and `NOT_FOUND` for nonexistent IDs.

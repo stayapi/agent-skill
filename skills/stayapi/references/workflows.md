@@ -70,7 +70,7 @@ Use `hotel_id` when you have it. Only fall back to URL resolution when the user 
 ```bash
 # From a URL? Resolve once, cache the id (slow: real-browser fetch, 5–40 s).
 curl -sS "${AUTH[@]}" \
-  "$BASE/v1/booking/hotel/url-to-id?url=https://www.booking.com/hotel/us/the-line-la.html"
+  "$BASE/v1/booking/hotel/url-to-id?url=https://www.booking.com/hotel/th/baan-coconut.html"
 # → {"hotel_id": "...", ...}
 
 # Compact details (v2, hotel_id only — it rejects url=):
