@@ -2,7 +2,7 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.11
+  version: 0.1.12
 ---
 
 # StayAPI — Live Hotel & Travel Data
@@ -86,7 +86,7 @@ Transient upstream errors (`upstream_error`, HTTP 502/503) are usually worth one
 ## Gotchas that bite agents
 
 - **Currency codes are canonical uppercase** — StayAPI accepts lowercase or surrounding whitespace and normalizes it, but agents should send three-letter uppercase codes such as `USD` or `EUR`. Malformed values fail as REST `INVALID_CURRENCY` or MCP `invalid_input` before a provider call.
-- **Booking `dest_id` is signed** — city IDs are negative (Phuket is `-3233180`). Stripping the minus silently returns 0 hotels with `success: true`. Preserve the sign end-to-end.
+- **Booking `dest_id` is signed** — city IDs are negative (Lisbon is `-2167973`). Stripping the minus silently returns 0 hotels with `success: true`. Preserve the sign end-to-end.
 - **Booking hotel URLs must be canonical**: `https://www.booking.com/hotel/{cc}/{slug}.html`. Search-result URLs are rejected with a 400.
 - **Booking destination lookup**: query the bare city name ("Savannah", not "Savannah, GA") — appending a region biases results to HOTEL-type matches. A HOTEL-type `dest_id` is that hotel's `hotel_id`.
 - **Prefer IDs over URLs on Booking** — URL resolution drives a real browser (5–40 s). Airbnb URL parsing is instant; Agoda URL resolution costs one quota unit (it fetches the page).

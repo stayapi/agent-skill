@@ -26,21 +26,21 @@ Dates in examples are placeholders — always use dates in the future, and pass 
 
 Use when the user names a city/area and wants a hotel list. Two steps: resolve the destination, then search it.
 
-**MCP**: `booking_lookup_destination(query="Phuket")` → `booking_search_hotels(dest_id=-3233180, checkin=..., checkout=...)`
+**MCP**: `booking_lookup_destination(query="Lisbon")` → `booking_search_hotels(dest_id=-2167973, checkin=..., checkout=...)`
 
 **REST**:
 
 ```bash
 # Step 1 — free-form name → dest_id. Use the bare city name (no region/state suffix).
-curl -sS "${AUTH[@]}" "$BASE/v1/booking/destinations/lookup?query=Phuket"
-# → {"success": true, "dest_id": -3233180, "dest_type": "CITY", ...}
+curl -sS "${AUTH[@]}" "$BASE/v1/booking/destinations/lookup?query=Lisbon"
+# → {"success": true, "dest_id": -2167973, "dest_type": "CITY", ...}
 # A "suggestions" array may accompany the resolved dest_id — the top-level dest_id is already
 # the top match, so proceed with it; surface the alternatives only if the user's intent is
 # genuinely unclear (e.g. "Springfield").
 
 # Step 2 — search that destination for a stay window.
-curl -sS "${AUTH[@]}" "$BASE/v1/booking/search?dest_id=-3233180&dest_type=CITY\
-&checkin=2026-09-11&checkout=2026-09-13&adults=2&rooms=1\
+curl -sS "${AUTH[@]}" "$BASE/v1/booking/search?dest_id=-2167973&dest_type=CITY\
+&checkin=2026-12-01&checkout=2026-12-04&adults=2&rooms=1\
 &rows_per_page=25&offset=0&currency=USD"
 ```
 
