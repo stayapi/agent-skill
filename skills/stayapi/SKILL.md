@@ -2,7 +2,7 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.12
+  version: 0.1.13
 ---
 
 # StayAPI — Live Hotel & Travel Data
@@ -19,11 +19,11 @@ Canonical links:
 
 ## Authentication — handle the key carefully
 
-Every call needs a StayAPI API key, sent as the `X-API-Key` header. Resolve it in this order:
+Every call needs a StayAPI API key, sent as the `X-API-Key` header — except through Claude's StayAPI connector, which signs in with OAuth instead. Resolve access in this order:
 
-1. **StayAPI MCP tools already connected** (tool names like `stayapi_*` or `mcp__stayapi__*`): just call them — the connector already carries the key, so you never touch it.
+1. **StayAPI MCP tools already connected** (tool names like `stayapi_*` or `mcp__stayapi__*`): just call them — the connector already carries the credentials (API key or OAuth sign-in), so you never touch a key.
 2. **`STAYAPI_API_KEY` environment variable**: use it by reference (`$STAYAPI_API_KEY`), never by value.
-3. **Neither present**: ask the user for their key, or point them to https://stayapi.com to create an account and copy it from the dashboard.
+3. **Neither present**: in claude.ai, Claude Desktop, or the Claude mobile app, have the user add the StayAPI connector (**Settings → Connectors → Add custom connector**, URL `https://api.stayapi.com/mcp`, then Connect and sign in — no key needed). Otherwise ask the user for their key, or point them to https://stayapi.com to create an account and copy it from the dashboard.
 
 The key is a paid credential tied to the user's quota and billing. Never print it, echo it, log it, commit it to a repository, or paste it into code, config files, or chat output. In shell commands always interpolate the variable; if the user pastes a key literal, put it in an environment variable first and use the variable from then on.
 
@@ -35,7 +35,7 @@ The key is a paid credential tied to the user's quota and billing. Never print i
 claude mcp add --scope user --transport http stayapi https://api.stayapi.com/mcp --header "X-API-Key: YOUR_API_KEY"
 ```
 
-(`--header` must come after the name and URL; a new session is needed to pick the server up.) Cursor and Claude Desktop snippets: see [references/tools.md](references/tools.md#connecting-an-mcp-client) or https://stayapi.com/docs/mcp.
+(`--header` must come after the name and URL; a new session is needed to pick the server up.) In Claude on the web, desktop, or mobile, the user adds it under **Settings → Connectors → Add custom connector** with URL `https://api.stayapi.com/mcp` and signs in (OAuth, no key). Cursor and Claude Desktop config snippets: see [references/tools.md](references/tools.md#connecting-an-mcp-client) or https://stayapi.com/docs/mcp.
 
 **REST.** Same data over plain HTTPS — use it when no MCP client is available or when scripting:
 

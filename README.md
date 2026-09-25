@@ -14,7 +14,7 @@ The skill guides the assistant to the right StayAPI capability — over the [MCP
 
 ## Requirements
 
-A StayAPI API key — sign up at [stayapi.com](https://stayapi.com) and copy it from the dashboard. The skill never asks you to paste the key into files or chats; it reads the `STAYAPI_API_KEY` environment variable or uses your already-configured MCP connector.
+A StayAPI account — sign up at [stayapi.com](https://stayapi.com). In Claude on the web, desktop, or mobile, add the StayAPI connector and sign in; no key needed. Elsewhere, copy your API key from the dashboard. The skill never asks you to paste the key into files or chats; it reads the `STAYAPI_API_KEY` environment variable or uses your already-configured MCP connector.
 
 ## Install
 
@@ -37,6 +37,8 @@ cp -R agent-skill/skills/stayapi ~/.claude/skills/stayapi
 ### Claude.ai / Claude Desktop
 
 Download `stayapi.skill` from the [latest release](https://github.com/stayapi/agent-skill/releases/latest) and upload it under **Settings → Capabilities → Skills**.
+
+For live data, also add the StayAPI connector: **Settings → Connectors → Add custom connector**, URL `https://api.stayapi.com/mcp`, then **Connect** and sign in to StayAPI.
 
 ## What's inside
 

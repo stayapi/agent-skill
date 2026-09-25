@@ -228,6 +228,8 @@ Auth failures surface as HTTP 401/403 (JSON-RPC `-32001` on MCP) — the key is 
 
 Full guide with screenshots and troubleshooting: https://stayapi.com/docs/mcp. Replace `YOUR_API_KEY` interactively — never write the key into a file you might commit.
 
+**Claude (web, desktop, mobile)** — no key: **Settings → Connectors → Add custom connector**, URL `https://api.stayapi.com/mcp`, then **Connect**, sign in to StayAPI, and **Allow**. The connector signs in with OAuth and syncs across Claude apps; the user revokes it under Connected apps on https://stayapi.com/user/mcp.
+
 **Claude Code** (note: `--header` must come after the name and URL; open a new session afterwards):
 
 ```bash
@@ -248,17 +250,17 @@ claude mcp add --scope user --transport http stayapi https://api.stayapi.com/mcp
 }
 ```
 
-**Claude Desktop** — `claude_desktop_config.json` (macOS: `~/Library/Application Support/Claude/`; Windows: `%APPDATA%\Claude\`), then fully quit (⌘Q) and relaunch. The no-space `X-API-Key:YOUR_API_KEY` form is deliberate — Claude Desktop re-tokenizes args containing spaces:
+**Claude Desktop, key-based alternative** — `claude_desktop_config.json` (macOS: `~/Library/Application Support/Claude/`; Windows: `%APPDATA%\Claude\`), then fully quit (⌘Q) and relaunch. The no-space `X-API-Key:YOUR_API_KEY` form is deliberate — Claude Desktop re-tokenizes args containing spaces, and `mcp-remote` is pinned because unpinned builds throw `Unexpected content type: null`:
 
 ```json
 {
   "mcpServers": {
     "stayapi": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://api.stayapi.com/mcp", "--header", "X-API-Key:YOUR_API_KEY"]
+      "args": ["-y", "mcp-remote@0.1.18", "https://api.stayapi.com/mcp", "--header", "X-API-Key:YOUR_API_KEY"]
     }
   }
 }
 ```
 
-ChatGPT custom connectors are **not** supported (they require OAuth). Batched JSON-RPC requests are rejected — one tool call at a time.
+ChatGPT custom connectors aren't verified yet. Batched JSON-RPC requests are rejected — one tool call at a time.
