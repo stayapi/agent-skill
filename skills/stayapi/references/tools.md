@@ -64,7 +64,7 @@ This is the Maps place-review surface. For a hotel, `google_travel_reviews` (bel
 
 ## Google Travel
 
-Deep per-hotel data from Google Travel. Everything keys off an `entity_token` — get one from `google_travel_resolve` (name → candidates) or from a `google_travel_search` result card, then fan out. Tokens are long opaque strings; pass them exactly as returned.
+Deep per-hotel data from Google Travel. Everything keys off an `entity_token` — get one from `google_travel_resolve` (name → candidates) or from a `google_travel_search` result card, then fan out. Tokens are opaque strings, including short `Cg…` and longer hotel/rental tokens; pass them exactly as returned. Tokens from similar can also be reused. Similar returns null for unsupported tokens; resolve by name instead.
 
 | MCP tool | REST | What it does |
 |---|---|---|
@@ -73,7 +73,7 @@ Deep per-hotel data from Google Travel. Everything keys off an `entity_token` �
 | `google_travel_summary` | `GET /v1/google_travel/summary` | Overall rating, review count, star histogram, per-topic sub-scores. |
 | `google_travel_info` | `GET /v1/google_travel/info` | Identity/metadata: address, coordinates, phone, check-in/out times, website, Maps ids. |
 | `google_travel_photos` | `GET /v1/google_travel/photos` | Photo gallery with dimensions. |
-| `google_travel_prices` | `GET /v1/google_travel/prices` | Nightly rate, usual-price band, partner booking offers. |
+| `google_travel_prices` | `GET /v1/google_travel/prices` | Nightly rate, usual-price band, partner booking offers. Optional paired `check_in`/`check_out` (YYYY-MM-DD, today/future, checkout later), `adults` 1–10 (default 2); omitted dates use Google defaults. |
 | `google_travel_similar` | `GET /v1/google_travel/similar` | Similar hotels + rentals nearby, each with its own token to pivot to. |
 | `google_travel_nearby` | `GET /v1/google_travel/nearby` | Nearby POIs (attractions, transit, airports, restaurants) with drive/walk times. |
 | `google_travel_reviews` | `GET /v1/google_reviews/travel/reviews` | Google-authored reviews: text `query` filter, `topic` (from summary's `topics[].category`), `sort`, token pagination. Keep filters identical across pages. |

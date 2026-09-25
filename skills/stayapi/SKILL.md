@@ -2,7 +2,7 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.13
+  version: 0.1.14
 ---
 
 # StayAPI — Live Hotel & Travel Data
@@ -53,7 +53,7 @@ Most tools take a platform-native ID, and there is a resolver for whatever the u
 | City / area name (Booking) | `booking_lookup_destination` | signed `dest_id` for `booking_search_hotels` |
 | Booking hotel URL | `GET /v1/booking/hotel/url-to-id` (or pass `url` straight to details/rooms/reviews tools) | numeric `hotel_id` — slow (5–40 s, real browser); cache it |
 | Airbnb URL | pass `url` directly — resolution is instant (regex) | `listing_id` |
-| Hotel name (Google Travel) | `google_travel_resolve` or `google_travel_search` | `entity_token` for all other `google_travel_*` tools |
+| Hotel name (Google Travel) | `google_travel_resolve` or `google_travel_search` | Opaque `entity_token` (including short `Cg…`) for all other `google_travel_*` tools |
 | Place name (Google Reviews) | `google_reviews_for_place` with `query` | first page + `data_id` to paginate with |
 | Place name → coordinates | `meta_coordinates_lookup` | `latitude`/`longitude` for OpenTable and Accor search |
 | TripAdvisor place name / URL | `tripadvisor_geo_search` / pass URL directly | `geo_id` / `location_id` |
