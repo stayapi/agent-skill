@@ -19,6 +19,8 @@ Dates in examples are placeholders — always use dates in the future, and pass 
 5. [Google reviews for a place](#5-google-reviews-for-a-place)
 6. [Airbnb listing details & reviews](#6-airbnb-listing-details--reviews)
 7. [Hilton property → dated cash and full-points rewards](#7-hilton-property--dated-cash-and-full-points-rewards)
+8. [Otelpuan hotel → dated room offers or reviews](#8-otelpuan-hotel--dated-room-offers-or-reviews)
+9. [HolidayCheck name → details or reviews](#9-holidaycheck-name--details-or-reviews)
 
 ---
 
@@ -222,3 +224,38 @@ price fields separately; there is no requested currency, rate calendar, or
 booking action. Optional `child_ages` is a comma-separated list of up to four
 ages (0–16). The public client uses repeated child-age query keys upstream;
 child-specific live availability has not yet been independently confirmed.
+
+## 9. HolidayCheck name → details or reviews
+
+Search by name when the user does not have a UUID. Use the returned `hotel_id`
+directly for details or reviews; the short provider URL returned by search is not
+a URL-resolver input. URL resolution remains useful for a supported long
+HolidayCheck hotel URL and is local only.
+
+**MCP**: `holidaycheck_hotels_search(query="Alexa Hotel")` →
+`holidaycheck_hotel_details(hotel_id="c6b63919-17b1-317d-a9e7-e69dbe195f2e")` or
+`holidaycheck_hotel_reviews(hotel_id="c6b63919-17b1-317d-a9e7-e69dbe195f2e", sort="recent_desc", page=1)`
+
+**REST**:
+
+```bash
+curl -sS "${AUTH[@]}" --get "$BASE/v1/holidaycheck/hotels/search" \
+  --data-urlencode "query=Alexa Hotel" -d page=1
+
+# Choose a returned hotel_id; details does not return prices or a photo gallery.
+curl -sS "${AUTH[@]}" \
+  "$BASE/v1/holidaycheck/hotel/details?hotel_id=c6b63919-17b1-317d-a9e7-e69dbe195f2e"
+
+curl -sS "${AUTH[@]}" \
+  "$BASE/v1/holidaycheck/hotel/reviews?hotel_id=c6b63919-17b1-317d-a9e7-e69dbe195f2e&page=1&sort=recent_desc"
+```
+
+Search accepts a trimmed 1–200-character query and one-based page; results are
+fixed at ten rows. `available_count` means HolidayCheck's returned candidate set,
+not every possible name match. Details preserve source descriptions, amenity
+groups, contact/location data, check-in/out text, star-rating source, and the
+provider summary. Reviews are fixed at ten items per page; `most_relevant` is
+the default, while `recent_desc` is newest-first and paginates with `has_more`.
+A supplied `review_date` is HolidayCheck's entry timestamp and `stay_date` is a
+separate month. `original_language` and `language` are source locales, not a
+translation guarantee. Owner replies are not returned.

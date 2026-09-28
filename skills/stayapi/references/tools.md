@@ -8,6 +8,7 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 - [Airbnb](#airbnb)
 - [Google Hotels](#google-hotels) · [Google Reviews](#google-reviews) · [Google Travel](#google-travel)
 - [TripAdvisor](#tripadvisor)
+- [HolidayCheck](#holidaycheck)
 - [Accor (ALL)](#accor-all)
 - [Radisson](#radisson)
 - [Marriott Bonvoy](#marriott-bonvoy)
@@ -88,6 +89,22 @@ Deep per-hotel data from Google Travel. Everything keys off an `entity_token` �
 | `tripadvisor_hotel_details` | `GET /v1/tripadvisor/hotel/details/{location_id}` or `…/hotel/details-from-url?url=` | One hotel's details. URL→ID is instant. |
 | `tripadvisor_hotel_reviews` | `GET /v1/tripadvisor/hotel/reviews/{location_id}` or `…/hotel/reviews-from-url?url=` | Paginated reviews with `language`. |
 | `tripadvisor_hotel_prices` | `GET /v1/tripadvisor/hotel/prices/{location_id}` or `…/hotel/prices-from-url?url=` | Live provider offers (Booking, Agoda, …) for a required stay window. |
+
+## HolidayCheck
+
+Search by hotel name or resolve a supported hotel URL, then use its UUID directly.
+Search is fixed at ten provider-returned candidates per page; `available_count`
+is not an exhaustive total. The resolver is local and strips query/fragment; it
+does not confirm hotel existence. Reviews are fixed at ten per page.
+`original_language` and `language` are HolidayCheck-supplied locales and do not
+guarantee translation.
+
+| MCP tool | REST | What it does |
+|---|---|---|
+| `holidaycheck_hotels_search` | `GET /v1/holidaycheck/hotels/search` | Hotel-name matches with UUIDs for follow-up calls; `query` is trimmed 1–200 characters, `page` starts at 1, 10/page. `available_count` is provider-returned, not exhaustive. |
+| `holidaycheck_hotel_url_to_id` | `GET /v1/holidaycheck/hotel/url-to-id` | Extract a lowercase hotel UUID from supported `.de`/`.com`/`.at`/`.ch` `hi` or `hr` hotel URL; no upstream fetch. |
+| `holidaycheck_hotel_details` | `GET /v1/holidaycheck/hotel/details` | Source-grounded property content, contact, descriptions, amenities, check-in/out, and provider summary by UUID. No prices or photo gallery. |
+| `holidaycheck_hotel_reviews` | `GET /v1/holidaycheck/hotel/reviews` | One review page plus provider aggregate by UUID; `page` starts at 1, `sort` is `most_relevant` or `recent_desc`, 10/page. No language, page-size, or owner-response controls. |
 
 ## Accor (ALL)
 
@@ -213,7 +230,7 @@ Restaurant data. Search is coordinate-based — resolve place names with `meta_c
 
 - **ID always wins** when you have one: no resolution step, no extra latency or quota.
 - Booking, Airbnb, and TripAdvisor single-item tools accept `url` directly. Airbnb and TripAdvisor URL parsing is instant; **Booking URL resolution takes 5–40 s** (real browser).
-- Radisson, OpenTable, Agoda, and WeHotel keep resolution explicit: call their `*_url_to_id` tool once, then use the id everywhere. Agoda's resolver costs a quota unit; OpenTable's is fast (no browser).
+- Radisson, OpenTable, Agoda, and WeHotel keep resolution explicit: call their `*_url_to_id` tool once, then use the id everywhere. HolidayCheck also supports hotel-name search, which returns UUIDs directly; its URL resolver remains local and makes no hotel-existence request. Agoda's resolver costs a quota unit.
 - Cache every resolved id for the rest of the session — they're stable.
 
 ## Quota, billing, and errors
