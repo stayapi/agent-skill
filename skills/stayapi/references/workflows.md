@@ -199,3 +199,26 @@ cash starting-offer scope. `reward_rates` has explicit `points_total` and dated
 empty, but every returned room has a verified offer. `members_only` and
 `login_required` describe booking restrictions; no Hilton login is needed to
 retrieve quotes. Never infer mixed-payment costs or fifth-night benefits.
+
+## 8. Otelpuan hotel → dated room offers or reviews
+
+Use text autocomplete when the caller has a hotel name. For a dated room quote,
+pass the returned canonical URL directly; do not substitute the numeric review
+ID. For reviews, use the numeric ID from search or URL resolution.
+
+**MCP**: `otelpuan_hotel_rooms(url="https://www.otelpuan.com/Turkler-Otel", check_in="2026-10-10", check_out="2026-10-12", adults=2)`
+
+**REST**:
+
+```bash
+curl -sS "${AUTH[@]}" --get "$BASE/v1/otelpuan/hotel/rooms" \
+  --data-urlencode "url=https://www.otelpuan.com/Turkler-Otel" \
+  -d check_in=2026-10-10 -d check_out=2026-10-12 -d adults=2
+```
+
+The rooms response is a quote for exactly that date window and party. `check_in`
+must be today or later in Europe/Istanbul. Preserve provider whole-stay and daily
+price fields separately; there is no requested currency, rate calendar, or
+booking action. Optional `child_ages` is a comma-separated list of up to four
+ages (0–16). The public client uses repeated child-age query keys upstream;
+child-specific live availability has not yet been independently confirmed.

@@ -14,6 +14,7 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 - [Hilton](#hilton)
 - [WeHotel (Jin Jiang)](#wehotel-jin-jiang)
 - [MakeMyTrip India](#makemytrip-india)
+- [Otelpuan](#otelpuan)
 - [OpenTable](#opentable)
 - [Agoda](#agoda) · [Trip.com](#tripcom) · [Meta (geocoding)](#meta-geocoding)
 - [URL vs ID — which to pass](#url-vs-id--which-to-pass)
@@ -160,6 +161,15 @@ Use a MakeMyTrip city code and dated stay for search. Search returns the numeric
 | `makemytrip_search_hotels` | `GET /v1/makemytrip/search` | Dated India city search. Takes `city_code`, future check-in/check-out, adults, one room, optional child ages, limit, and an opaque cursor. Reuse a cursor only with identical search inputs and limit. |
 | `makemytrip_get_hotel_details` | `GET /v1/makemytrip/hotel/details` | Hotel description, amenities, location, and public photos by numeric `hotel_id` and stay. |
 | `makemytrip_get_hotel_reviews` | `GET /v1/makemytrip/hotel/reviews` | Reviews by numeric `hotel_id`; start with `next_ota=MMT` and continue only while `source_changed` is false and `next_start` is present. |
+
+## Otelpuan
+
+| MCP tool | REST | What it does |
+|---|---|---|
+| `otelpuan_search_hotels` | `GET /v1/otelpuan/search?query=` | Text autocomplete → hotel IDs, names, canonical URLs, and nullable locations. It returns hotel suggestions only and is not exhaustive destination inventory; use its ID directly with `otelpuan_hotel_reviews`. |
+| `otelpuan_hotel_url_to_id` | `GET /v1/otelpuan/hotel/url-to-id?url=` | Full Otelpuan root-slug URL → stable numeric `hotel_id`, identity, page aggregate 0–10 rating, and review count. Query strings and fragments are ignored; nested paths and trailing slashes are invalid. |
+| `otelpuan_hotel_rooms` | `GET /v1/otelpuan/hotel/rooms?url=&check_in=&check_out=&adults=&child_ages=` | Dated room offers by canonical Otelpuan URL; ISO dates, adults 1–10 (default 2), optional comma-separated child ages (0–16, max 4). Whole-stay and per-date provider prices remain separate. No currency selector, calendar, booking action, or numeric-ID input. |
+| `otelpuan_hotel_reviews` | `GET /v1/otelpuan/hotel/reviews?hotel_id=&page=` | Hotel ID → up to 10 reviews per one-based page. Start with `otelpuan_hotel_url_to_id` only when you have a URL, then reuse its ID. The ID-only payload does not include hotel name, URL, or aggregate rating, so those are null. `stay_date` is month-level where supplied; `review_date` is always null because upstream has no publication date. |
 
 ## OpenTable
 

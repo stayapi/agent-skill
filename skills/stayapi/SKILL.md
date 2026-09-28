@@ -1,13 +1,13 @@
 ---
 name: stayapi
-description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
+description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.14
+  version: 0.1.15
 ---
 
 # StayAPI — Live Hotel & Travel Data
 
-StayAPI is a hosted API that returns live, structured data from the major travel platforms: Booking.com, Airbnb, Google Hotels / Google Travel / Google Reviews, TripAdvisor, Agoda, Trip.com, Accor (ALL), Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable. One successful data call or definitive business negative costs one quota unit, on any platform, over either transport. MCP input/provider/protocol failures do not consume quota.
+StayAPI is a hosted API that returns live, structured data from the major travel platforms: Booking.com, Airbnb, Google Hotels / Google Travel / Google Reviews, TripAdvisor, Agoda, Trip.com, Accor (ALL), Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. One successful data call or definitive business negative costs one quota unit, on any platform, over either transport. MCP input/provider/protocol failures do not consume quota.
 
 Canonical links:
 
@@ -60,6 +60,8 @@ Most tools take a platform-native ID, and there is a resolver for whatever the u
 | Agoda, Radisson, OpenTable, WeHotel URL | the platform's dedicated `*_url_to_id` tool | platform ID for that platform's other tools |
 | Marriott property (no URL resolver) | `marriott_bonvoy_search` by coordinates (`meta_coordinates_lookup` first if you only have a place name) | `property_id` code for `marriott_bonvoy_rooms` |
 | Hilton property URL or place | `hilton_hotel_url_to_id` or `hilton_search` | seven-character `hotel_code`; use `hilton_rooms` for dated starting cash rates and full-points rewards |
+| Otelpuan hotel name or destination | `otelpuan_search_hotels` | hotel-only autocomplete results with IDs for `otelpuan_hotel_reviews`; not exhaustive inventory |
+| Otelpuan hotel URL | `otelpuan_hotel_rooms` for dated room offers; `otelpuan_hotel_url_to_id` then `otelpuan_hotel_reviews` for metadata/reviews | Rooms takes the canonical URL, ISO stay dates, and party; reviews require the numeric ID |
 
 ## Core workflows
 
