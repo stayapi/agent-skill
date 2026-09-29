@@ -133,7 +133,7 @@ Covers Sofitel, Fairmont, Novotel, Ibis, and other Accor brands. Search takes `l
 | `radisson_hotel_photos` | `GET /v1/radisson/hotel/photos` | Full categorized gallery. |
 | `radisson_price_calendar` | `GET /v1/radisson/hotel/price-calendar` | Public lowest-price calendar, up to 60 days. |
 | `radisson_hotel_rates` | `GET /v1/radisson/hotel/rates` | Live lowest cash rate for one stay, optional member rates. |
-| `radisson_hotel_room_rates` | `GET /v1/radisson/hotel/room-rates` | Exact live room groups with prices and booking conditions. |
+| `radisson_hotel_room_rates` | `GET /v1/radisson/hotel/room-rates` | Raw room groups plus `normalized_rates`: single-room cash alternatives and redeemable nightly/stay points. `reward_rate.points` is the first night; `points_total` sums dated quotes. Final redemption cash payable is unverified; inspect status fields and retain raw offers. |
 
 ## Marriott Bonvoy
 
