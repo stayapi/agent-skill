@@ -270,3 +270,9 @@ the default, while `recent_desc` is newest-first and paginates with `has_more`.
 A supplied `review_date` is HolidayCheck's entry timestamp and `stay_date` is a
 separate month. `original_language` and `language` are source locales, not a
 translation guarantee. Owner replies are not returned.
+
+## Native Expedia / Vrbo destination discovery
+
+1. Call the provider's `/destinations/lookup?query=` and preserve the selected `region_id` as a string.
+2. Call `/search` with region ID, required check-in/check-out and adults; follow the returned continuation pair. Cards are discovery, not confirmed availability; prices are omitted and search currency is USD.
+3. For Expedia property-name requests, use `/hotel/lookup?query=&region_id=` and pass the selected property ID to reviews or rates. Vrbo has no verified native property-name resolver. Its search returns internal `property_id` for reviews separately from the public `listing_id` in canonical URLs.

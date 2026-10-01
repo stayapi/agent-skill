@@ -6,6 +6,7 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 
 - [Booking.com](#bookingcom)
 - [Airbnb](#airbnb)
+- [Expedia](#expedia) · [Vrbo](#vrbo)
 - [Google Hotels](#google-hotels) · [Google Reviews](#google-reviews) · [Google Travel](#google-travel)
 - [TripAdvisor](#tripadvisor)
 - [HolidayCheck](#holidaycheck)
@@ -298,3 +299,20 @@ claude mcp add --scope user --transport http stayapi https://api.stayapi.com/mcp
 ```
 
 ChatGPT works in developer mode (web, paid plans): chatgpt.com/plugins → **+** → **Create MCP app** → URL `https://api.stayapi.com/mcp`, auth OAuth (leave client ID/secret blank) → approve on stayapi.com → install from personal plugins → use with @StayAPI. Batched JSON-RPC requests are rejected — one tool call at a time.
+
+## Expedia
+
+| MCP tool | REST | What it does |
+|---|---|---|
+| — | `GET /v1/expedia/destinations/lookup?query=` | Destination suggestions with numeric-string region IDs. |
+| — | `GET /v1/expedia/hotel/lookup?query=&region_id=` | Dateless HOTEL name suggestions in region context; property IDs compose with reviews/rates. |
+| — | `GET /v1/expedia/search?region_id=&check_in=&check_out=` | Dated primary cards. Required ordered dates, adults 1–8, offset 0–1000, limit 1–10; USD only, prices omitted. |
+
+## Vrbo
+
+| MCP tool | REST | What it does |
+|---|---|---|
+| — | `GET /v1/vrbo/destinations/lookup?query=` | Native destination region IDs. |
+| — | `GET /v1/vrbo/search?region_id=&check_in=&check_out=` | Dated discovery; same date/adult/page/USD bounds as Expedia. Internal `property_id` is for reviews; public `listing_id` (possibly ending in `ha`) is for URLs. |
+
+For both providers, search responses (and Expedia property-name lookup) report `availability_verified: false`; destination suggestions do not carry that field. Continue only using `next_offset`/`next_limit`, never infer completeness from count. Native Vrbo property-name lookup is not available; do not substitute a search engine or fabricate a resolver. Neither provider has MCP tools.

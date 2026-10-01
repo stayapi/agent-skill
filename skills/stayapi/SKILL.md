@@ -1,13 +1,13 @@
 ---
 name: stayapi
-description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
+description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Expedia, Vrbo, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.18
+  version: 0.1.19
 ---
 
 # StayAPI — Live Hotel & Travel Data
 
-StayAPI is a hosted API that returns live, structured data from the major travel platforms: Booking.com, Airbnb, Google Hotels / Google Travel / Google Reviews, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor (ALL), Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. One successful data call or definitive business negative costs one quota unit, on any platform, over either transport. MCP input/provider/protocol failures do not consume quota.
+StayAPI is a hosted API that returns live, structured data from the major travel platforms: Booking.com, Airbnb, Expedia, Vrbo, Google Hotels / Google Travel / Google Reviews, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor (ALL), Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. One successful data call or definitive business negative costs one quota unit, on any platform, over either transport. MCP input/provider/protocol failures do not consume quota.
 
 Canonical links:
 
@@ -29,7 +29,7 @@ The key is a paid credential tied to the user's quota and billing. Never print i
 
 ## Two transports
 
-**MCP (preferred when available).** The server at `https://api.stayapi.com/mcp` exposes every capability as a tool. If StayAPI tools are visible, call them directly — no HTTP assembly, no key handling. To connect Claude Code:
+**MCP (preferred when available).** The server at `https://api.stayapi.com/mcp` exposes the capabilities listed with MCP names in the catalog. If StayAPI tools are visible, call them directly — no HTTP assembly, no key handling. To connect Claude Code:
 
 ```bash
 claude mcp add --scope user --transport http stayapi https://api.stayapi.com/mcp --header "X-API-Key: YOUR_API_KEY"
@@ -53,6 +53,8 @@ Most tools take a platform-native ID, and there is a resolver for whatever the u
 | City / area name (Booking) | `booking_lookup_destination` | signed `dest_id` for `booking_search_hotels` |
 | Booking hotel URL | `GET /v1/booking/hotel/url-to-id` (or pass `url` straight to details/rooms/reviews tools) | numeric `hotel_id` — slow (5–40 s, real browser); cache it |
 | Airbnb destination | `airbnb_search_listings(location=...)` | first-page listing cards only; no property-name lookup or availability guarantee |
+| Expedia destination or property name | REST `/v1/expedia/destinations/lookup?query=`; property-name suggestions `/v1/expedia/hotel/lookup?query=&region_id=` | string `region_id` for dated search; `property_id` for reviews/rates; suggestions do not verify availability |
+| Vrbo destination | REST `/v1/vrbo/destinations/lookup?query=`, then required-date `/v1/vrbo/search` | internal review `property_id` and distinct public `listing_id`; native property-name lookup unavailable |
 | Airbnb URL | pass `url` directly — resolution is instant (regex) | `listing_id` |
 | Hotel name (Google Travel) | `google_travel_resolve` or `google_travel_search` | Opaque `entity_token` (including short `Cg…`) for all other `google_travel_*` tools |
 | Place name (Google Reviews) | `google_reviews_for_place` with `query` | first page + `data_id` to paginate with |
@@ -101,3 +103,7 @@ Transient upstream errors (`upstream_error`, HTTP 502/503) are usually worth one
 - **Page-size caps**: Booking reviews 25/page · Airbnb reviews 50/page · HolidayCheck 10/page · Agoda 20/page · OpenTable 25/page · WeHotel 20/page · Accor reviews capped at 20 total (upstream limit).
 - **Airbnb search is first-page destination discovery** — use `airbnb_search_listings(location=...)`, not a listing title. Optional dates can qualify a displayed price; undated results omit prices, and search never confirms availability or exposes pagination.
 - **Trip.com reviews are slow by design** (a real browser defeats bot detection) — expect several seconds per page and keep `page_size` generous to minimize calls.
+
+### Expedia and Vrbo discovery (REST)
+
+Resolve native destination region IDs, then pass required ordered stay dates to search. Expedia additionally provides regional property-name suggestions via `/v1/expedia/hotel/lookup`; Vrbo property-name lookup is unavailable. See [the tool catalog](references/tools.md#expedia) for continuation and dual Vrbo ID semantics. These search cards omit prices and never confirm availability.
