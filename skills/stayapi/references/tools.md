@@ -89,7 +89,7 @@ Deep per-hotel data from Google Travel. Everything keys off an `entity_token` �
 | `tripadvisor_geo_search` | `GET /v1/tripadvisor/geo-search` | Place name → `geo_id`. First step before area search. |
 | `tripadvisor_search_hotels` | `GET /v1/tripadvisor/search` | Hotels in a `geo_id` area; each carries a `location_id`. |
 | `tripadvisor_hotel_details` | `GET /v1/tripadvisor/hotel/details/{location_id}` or `…/hotel/details-from-url?url=` | One hotel's details. URL→ID is instant. |
-| `tripadvisor_hotel_reviews` | `GET /v1/tripadvisor/hotel/reviews/{location_id}` or `…/hotel/reviews-from-url?url=` | Paginated reviews with `language`. |
+| `tripadvisor_hotel_reviews` | `GET /v1/tripadvisor/hotel/reviews/{location_id}` or `…/hotel/reviews-from-url?url=` | Paginated reviews with `language`. At most 20 per page; `per_page` above 20 is treated as 20. |
 | `tripadvisor_hotel_prices` | `GET /v1/tripadvisor/hotel/prices/{location_id}` or `…/hotel/prices-from-url?url=` | Live provider offers (Booking, Agoda, …) for a required stay window. |
 
 ## HolidayCheck
