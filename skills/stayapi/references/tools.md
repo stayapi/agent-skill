@@ -18,6 +18,7 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 - [Otelpuan](#otelpuan)
 - [OpenTable](#opentable)
 - [Agoda](#agoda) · [Trip.com](#tripcom) · [Meta (geocoding)](#meta-geocoding)
+- [Display (ChatGPT hotel cards)](#display-chatgpt-hotel-cards)
 - [URL vs ID — which to pass](#url-vs-id--which-to-pass)
 - [Quota, billing, and errors](#quota-billing-and-errors)
 - [Connecting an MCP client](#connecting-an-mcp-client)
@@ -44,9 +45,9 @@ Canonical URL shape (anything else is a 400): `https://www.booking.com/hotel/{cc
 
 | MCP tool | REST | What it does |
 |---|---|---|
+| `airbnb_search_listings` | `GET /v1/airbnb/search?location=` | First-page destination listings. Optional paired dates; undated results omit prices and neither mode verifies availability. No property-name lookup or pagination. |
 | `airbnb_listing_details` | `GET /v1/airbnb/listing/{id}/details` or `/v1/airbnb/listing/details-from-url?url=` | Listing details. `check_in`/`check_out` required. URL parsing is instant. |
 | `airbnb_listing_reviews` | `GET /v1/airbnb/listing/reviews/{id}` or `/v1/airbnb/listing/reviews-from-url?url=` | Reviews, up to 50/page, `sort_by=BEST_QUALITY\|MOST_RECENT`. |
-| `airbnb_search_listings` | — | ⚠️ Stub — returns `feature_unavailable`, not billed. No Airbnb location search yet. |
 
 REST also has per-listing `pricing`, `calendar`, `cancellation-policy`, `payment-methods`, and `extract-id`.
 
@@ -224,6 +225,12 @@ Restaurant data. Search is coordinate-based — resolve place names with `meta_c
 |---|---|---|
 | `meta_coordinates_lookup` | `GET /v1/meta/coordinates-lookup` | Place name → candidate locations with `latitude`/`longitude`, type, country. Feeds OpenTable and Accor search. |
 
+## Display (ChatGPT hotel cards)
+
+| MCP tool | REST | What it does |
+|---|---|---|
+| `show_hotels` | — | Renders hotels you already fetched as visual cards + compare view in MCP Apps clients (ChatGPT). Pass name, photo_url, price/currency/price_per, rating/rating_max, review_count, address, url, provider. Fetches nothing; not billed. |
+
 ---
 
 ## URL vs ID — which to pass
@@ -235,7 +242,7 @@ Restaurant data. Search is coordinate-based — resolve place names with `meta_c
 
 ## Quota, billing, and errors
 
-- Billable: every successful data `tools/call` / REST data request — one unit each. Not billed: MCP housekeeping (`initialize`, `tools/list`), the `airbnb_search_listings` stub, unknown tool names.
+- Billable: every successful data `tools/call` / REST data request — one unit each. Not billed: MCP housekeeping (`initialize`, `tools/list`), the `show_hotels` display tool, and unknown tool names.
 - REST errors: RFC 7807 `application/problem+json`; only 2xx bodies are data.
 - MCP structured errors and how to react:
 
@@ -247,7 +254,7 @@ Restaurant data. Search is coordinate-based — resolve place names with `meta_c
 | `no_results` | Valid query, nothing matched | Report honestly; loosen the query |
 | `rate_limited` | Scraper queue saturated | Back off `retry_after` seconds, retry once or twice |
 | `quota_exhausted` | Monthly quota used up | Stop. Tell the user the `reset_at` time; suggest upgrading |
-| `feature_unavailable` | Not built (Airbnb search) | Offer an alternative platform; votes go to info@stayapi.com |
+| `feature_unavailable` | A requested feature is not built | Offer an alternative supported workflow |
 
 Auth failures surface as HTTP 401/403 (JSON-RPC `-32001` on MCP) — the key is missing, wrong, or the account is blocked.
 
@@ -290,4 +297,4 @@ claude mcp add --scope user --transport http stayapi https://api.stayapi.com/mcp
 }
 ```
 
-ChatGPT custom connectors aren't verified yet. Batched JSON-RPC requests are rejected — one tool call at a time.
+ChatGPT works in developer mode (web, paid plans): chatgpt.com/plugins → **+** → **Create MCP app** → URL `https://api.stayapi.com/mcp`, auth OAuth (leave client ID/secret blank) → approve on stayapi.com → install from personal plugins → use with @StayAPI. Batched JSON-RPC requests are rejected — one tool call at a time.

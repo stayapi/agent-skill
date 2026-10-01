@@ -17,7 +17,7 @@ Dates in examples are placeholders — always use dates in the future, and pass 
 3. [Guest reviews & date-range backfill (Booking)](#3-guest-reviews--date-range-backfill-booking)
 4. [Google Hotels search](#4-google-hotels-search)
 5. [Google reviews for a place](#5-google-reviews-for-a-place)
-6. [Airbnb listing details & reviews](#6-airbnb-listing-details--reviews)
+6. [Airbnb destination search, listing details & reviews](#6-airbnb-destination-search-listing-details--reviews)
 7. [Hilton property → dated cash and full-points rewards](#7-hilton-property--dated-cash-and-full-points-rewards)
 8. [Otelpuan hotel → dated room offers or reviews](#8-otelpuan-hotel--dated-room-offers-or-reviews)
 9. [HolidayCheck name → details or reviews](#9-holidaycheck-name--details-or-reviews)
@@ -149,9 +149,21 @@ Details that matter for review requests:
 - **Edited reviews reorder by edit time**, while `iso_date` keeps the *original* post date — a review "edited 6 hours ago" can carry `iso_date: 2018-…`. A paginate-until-cutoff backfill on Google reviews must tolerate these outliers rather than stopping at the first old `iso_date`.
 - **Two Google review surfaces exist**: this one (`google_reviews_for_place`) is Google Maps place reviews and works for any place type — hotels, restaurants, attractions. `google_travel_reviews` is Google's hotel-only Travel surface (entity_token-keyed, supports topic filters). For a hotel either works: answer "Google reviews for X" with this one; use the travel one when you're already holding an `entity_token` or need topic/text filtering. See [tools.md](tools.md#google-travel).
 
-## 6. Airbnb listing details & reviews
+## 6. Airbnb destination search, listing details & reviews
 
-Airbnb URL→ID is an instant regex — passing a URL costs nothing extra.
+Use destination search when the user needs listings; it is not a property-name lookup and returns the first page only. Airbnb URL→ID is an instant regex — passing a URL costs nothing extra.
+
+**MCP**: `airbnb_search_listings(location="Paris, France", check_in="2026-10-15", check_out="2026-10-18", adults=2)`
+
+**REST**:
+
+```bash
+curl -sS "${AUTH[@]}" --get "$BASE/v1/airbnb/search" \
+  --data-urlencode "location=Paris, France" \
+  -d check_in=2026-10-15 -d check_out=2026-10-18 -d adults=2 -d currency=USD
+```
+
+`page_scope` is always `first_page`, `availability_verified` is always false, and no cursor is returned. A dated result exposes `displayed_price` only when `price_applies_to_requested_dates=true`; an undated result omits all prices.
 
 **MCP**: `airbnb_listing_details(url="https://www.airbnb.com/rooms/22120898", check_in=..., check_out=...)` · `airbnb_listing_reviews(listing_id=22120898, sort_by="MOST_RECENT")`
 
@@ -173,7 +185,6 @@ curl -sS "${AUTH[@]}" \
 
 - `sort_by`: `BEST_QUALITY` (default) or `MOST_RECENT` — use `MOST_RECENT` for backfills, same stop-at-cutoff pattern as Booking.
 - REST also exposes per-listing `pricing`, `calendar`, `cancellation-policy`, and `payment-methods` (same `/v1/airbnb/listing/…` shape) — see https://stayapi.com/docs.
-- **No Airbnb search by location** — `airbnb_search_listings` is an unbilled stub. For "find me an Airbnb in X", search Booking / Google Hotels instead and say why.
 
 ## 7. Hilton property → dated cash and full-points rewards
 
