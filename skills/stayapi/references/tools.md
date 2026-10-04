@@ -317,3 +317,17 @@ ChatGPT works in developer mode (web, paid plans): chatgpt.com/plugins → **+**
 | — | `GET /v1/vrbo/search?region_id=&check_in=&check_out=` | Dated discovery; same date/adult/page/USD bounds as Expedia. Internal `property_id` is for reviews; public `listing_id` (possibly ending in `ha`) is for URLs. |
 
 For both providers, search responses (and Expedia property-name lookup) report `availability_verified: false`; destination suggestions do not carry that field. Continue only using `next_offset`/`next_limit`, never infer completeness from count. Native Vrbo property-name lookup is not available; do not substitute a search engine or fabricate a resolver. Expedia exposes only `expedia_hotel_rates` through MCP; Expedia discovery/reviews and all Vrbo operations use REST.
+
+### Booking family rates and labels
+
+`booking_hotel_rooms` and `booking_search_hotels` accept `children` (0–10) and
+`children_ages` (comma-separated ages 0–17, exactly one per child). Use
+`children=1, children_ages="8"` for a child aged eight. Zero children needs no ages.
+Price objects return string `labels` (empty when absent), nullable numeric
+`genius_discount_pct`, and boolean `is_mobile_rate`. These describe explicit
+anonymous rate markers, never hotel Genius eligibility or sign-in-only offers.
+Rooms retain `genius_discount_percentage` and `price.discount_name`.
+`rates[].fits_requested_occupancy` is true only when one rate fits the entire
+requested party; false/null alternatives must not be used as a full-family quote.
+REST prices has the same occupancy and labels contract; its summary is per-room,
+not a combined multi-room reservation total. See the public Booking endpoint documentation at https://stayapi.com/docs/endpoints/booking-hotel-rooms.

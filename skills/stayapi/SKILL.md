@@ -2,7 +2,7 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Expedia, Vrbo, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.24
+  version: 0.1.25
 ---
 
 # StayAPI — Live Hotel & Travel Data
@@ -109,3 +109,5 @@ Transient upstream errors (`upstream_error`, HTTP 502/503) are usually worth one
 Use `expedia_hotel_rates` with a numeric `property_id`, ordered nonpast dates, and optional `children_ages` as a JSON integer array (up to six ages 0–17). Omit it or use `[]` for adults-only rates. Expedia discovery and reviews, and Vrbo, use REST.
 
 Resolve native destination region IDs, then pass required ordered stay dates to search. Expedia additionally provides regional property-name suggestions via `/v1/expedia/hotel/lookup`; Vrbo property-name lookup is unavailable. See [the tool catalog](references/tools.md#expedia) for continuation and dual Vrbo ID semantics. These search cards omit prices and never confirm availability.
+
+- **Booking families:** supply `children` plus exactly that many comma-separated `children_ages` (0–17). Price labels describe explicit anonymous rate markers; do not infer Genius discounts from property eligibility. Use only `fits_requested_occupancy: true` rates for full-family comparisons; prices summaries are per-room, not multi-room totals.
