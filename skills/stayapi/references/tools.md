@@ -307,7 +307,7 @@ ChatGPT works in developer mode (web, paid plans): chatgpt.com/plugins → **+**
 | — | `GET /v1/expedia/destinations/lookup?query=` | Destination suggestions with numeric-string region IDs. |
 | — | `GET /v1/expedia/hotel/lookup?query=&region_id=` | Dateless HOTEL name suggestions in region context; property IDs compose with reviews/rates. |
 | — | `GET /v1/expedia/search?region_id=&check_in=&check_out=` | Dated primary cards. Required ordered dates, adults 1–8, offset 0–1000, limit 1–10; USD only, prices omitted. |
-| — | `GET /v1/expedia/hotel/rates?property_id=&check_in=&check_out=` | Live room offers. Optional comma-separated `children_ages` accepts up to six ages from 0–17; omit it for adults-only rates. Priced inventory or explicit sold-out empties are valid. |
+| `expedia_hotel_rates` | `GET /v1/expedia/hotel/rates?property_id=&check_in=&check_out=` | Live room offers. MCP `children_ages` is a JSON integer array; REST uses comma-separated ages. Both accept up to six ages from 0–17; omit or use an empty MCP array for adults-only rates. Adults 1–10, ordered nonpast YYYY-MM-DD dates. Currency defaults to USD; other three-letter codes are accepted but conversion is not confirmed. Priced inventory or explicit sold-out empties are valid. |
 
 ## Vrbo
 
@@ -316,4 +316,4 @@ ChatGPT works in developer mode (web, paid plans): chatgpt.com/plugins → **+**
 | — | `GET /v1/vrbo/destinations/lookup?query=` | Native destination region IDs. |
 | — | `GET /v1/vrbo/search?region_id=&check_in=&check_out=` | Dated discovery; same date/adult/page/USD bounds as Expedia. Internal `property_id` is for reviews; public `listing_id` (possibly ending in `ha`) is for URLs. |
 
-For both providers, search responses (and Expedia property-name lookup) report `availability_verified: false`; destination suggestions do not carry that field. Continue only using `next_offset`/`next_limit`, never infer completeness from count. Native Vrbo property-name lookup is not available; do not substitute a search engine or fabricate a resolver. Neither provider has MCP tools.
+For both providers, search responses (and Expedia property-name lookup) report `availability_verified: false`; destination suggestions do not carry that field. Continue only using `next_offset`/`next_limit`, never infer completeness from count. Native Vrbo property-name lookup is not available; do not substitute a search engine or fabricate a resolver. Expedia exposes only `expedia_hotel_rates` through MCP; Expedia discovery/reviews and all Vrbo operations use REST.

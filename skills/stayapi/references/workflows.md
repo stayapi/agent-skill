@@ -275,4 +275,4 @@ translation guarantee. Owner replies are not returned.
 
 1. Call the provider's `/destinations/lookup?query=` and preserve the selected `region_id` as a string.
 2. Call `/search` with region ID, required check-in/check-out and adults; follow the returned continuation pair. Cards are discovery, not confirmed availability; prices are omitted and search currency is USD.
-3. For Expedia property-name requests, use `/hotel/lookup?query=&region_id=` and pass the selected property ID to reviews or rates. Vrbo has no verified native property-name resolver. Its search returns internal `property_id` for reviews separately from the public `listing_id` in canonical URLs.
+3. For Expedia property-name requests, use `/hotel/lookup?query=&region_id=` and pass the selected property ID to REST reviews or `expedia_hotel_rates` with stay dates. For children, pass `children_ages=[5, 8]` to MCP (REST rates use `children_ages=5,8`). Vrbo has no verified native property-name resolver. Its search returns internal `property_id` for reviews separately from the public `listing_id` in canonical URLs.
