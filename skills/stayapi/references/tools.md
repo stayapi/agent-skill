@@ -331,3 +331,8 @@ Rooms retain `genius_discount_percentage` and `price.discount_name`.
 requested party; false/null alternatives must not be used as a full-family quote.
 REST prices has the same occupancy and labels contract; its summary is per-room,
 not a combined multi-room reservation total. See the public Booking endpoint documentation at https://stayapi.com/docs/endpoints/booking-hotel-rooms.
+
+
+### Booking point-of-sale options
+
+`booking_search_hotels` and `booking_hotel_rooms` accept optional ISO `market` (ES: es/EUR; US: en-us/USD), `language`, and `currency`. Explicit display overrides win. Legacy `country_market` retains en-us/USD defaults and must match `market` if both are supplied. Other configured defaults and fallback are documented in the Booking endpoint reference. Compare identical occupancy, stay, currency and room/rate; tax-inclusive versus tax-exclusive headlines are not discounts. `effective_market` reports requested_country, nullable targeted_country, language, currency, country_verified=false and verified_country=null. Targeting is best-effort, not verified geography.

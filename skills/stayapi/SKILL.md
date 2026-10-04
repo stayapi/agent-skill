@@ -2,7 +2,7 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Expedia, Vrbo, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.25
+  version: 0.1.26
 ---
 
 # StayAPI — Live Hotel & Travel Data
@@ -44,32 +44,28 @@ curl -sS -H "X-API-Key: $STAYAPI_API_KEY" \
   "https://api.stayapi.com/v1/booking/destinations/lookup?query=Phuket"
 ```
 
+## Discover before guessing
+
+For an MCP client, use its automatic tool discovery or standard `tools/list` protocol
+before choosing an unfamiliar tool or supplying provider-specific fields. It returns
+the current tool names, descriptions, required fields, types, bounds, and defaults
+for that account; disabled tools are absent. It is free housekeeping, not a data
+request. Read [the discovery workflow](references/agent-discovery.md) when you need a
+schema, an error needs correction, or the visible tool set differs from this skill.
+
+Keep this entrypoint for access, the common resolve-then-fetch pattern, and cross-provider
+constraints. Load [workflows.md](references/workflows.md) for a core flow and
+[tools.md](references/tools.md) only for a provider-specific capability or REST lookup.
+
 ## The core pattern: resolve an ID, then fetch
 
-Most tools take a platform-native ID, and there is a resolver for whatever the user actually has. Resolve once, then reuse the ID — IDs are stable, and some URL resolutions are slow or cost a quota unit of their own.
-
-| You have | Resolve with | You get |
-|---|---|---|
-| City / area name (Booking) | `booking_lookup_destination` | signed `dest_id` for `booking_search_hotels` |
-| Booking hotel URL | `GET /v1/booking/hotel/url-to-id` (or pass `url` straight to details/rooms/reviews tools) | numeric `hotel_id` — slow (5–40 s, real browser); cache it |
-| Airbnb destination | `airbnb_search_listings(location=...)` | first-page listing cards only; no property-name lookup or availability guarantee |
-| Expedia destination or property name | REST `/v1/expedia/destinations/lookup?query=`; property-name suggestions `/v1/expedia/hotel/lookup?query=&region_id=` | string `region_id` for dated search; `property_id` for reviews/rates; suggestions do not verify availability |
-| Vrbo destination | REST `/v1/vrbo/destinations/lookup?query=`, then required-date `/v1/vrbo/search` | internal review `property_id` and distinct public `listing_id`; native property-name lookup unavailable |
-| Airbnb URL | pass `url` directly — resolution is instant (regex) | `listing_id` |
-| Hotel name (Google Travel) | `google_travel_resolve` or `google_travel_search` | Opaque `entity_token` (including short `Cg…`) for all other `google_travel_*` tools |
-| Place name (Google Reviews) | `google_reviews_for_place` with `query` | first page + `data_id` to paginate with |
-| Place name → coordinates | `meta_coordinates_lookup` | `latitude`/`longitude` for OpenTable and Accor search |
-| TripAdvisor place name / URL | `tripadvisor_geo_search` / pass URL directly | `geo_id` / `location_id` |
-| Agoda, Radisson, OpenTable, WeHotel URL | the platform's dedicated `*_url_to_id` tool | platform ID for that platform's other tools |
-| HolidayCheck hotel name / URL | `holidaycheck_hotels_search` / `holidaycheck_hotel_url_to_id` | lowercase hotel UUID; then use `holidaycheck_hotel_details` or `holidaycheck_hotel_reviews` |
-| Marriott property (no URL resolver) | `marriott_bonvoy_search` by coordinates (`meta_coordinates_lookup` first if you only have a place name) | `property_id` code for `marriott_bonvoy_rooms` |
-| Hilton property URL or place | `hilton_hotel_url_to_id` or `hilton_search` | seven-character `hotel_code`; use `hilton_rooms` for dated starting cash rates and full-points rewards |
-| Otelpuan hotel name or destination | `otelpuan_search_hotels` | hotel-only autocomplete results with IDs for `otelpuan_hotel_reviews`; not exhaustive inventory |
-| Otelpuan hotel URL | `otelpuan_hotel_rooms` for dated room offers; `otelpuan_hotel_url_to_id` then `otelpuan_hotel_reviews` for metadata/reviews | Rooms takes the canonical URL, ISO stay dates, and party; reviews require the numeric ID |
+Most tools take a platform-native ID. Resolve once, reuse the returned ID or cursor,
+and do not substitute an ID from another provider. Read [identifiers.md](references/identifiers.md)
+when the user starts with a name or URL, or when the provider's resolver is unclear.
 
 ## Core workflows
 
-The six flows below cover most requests; [references/workflows.md](references/workflows.md) has complete worked examples of each (MCP call sequence + copy-paste REST curl):
+The core flows below cover most requests; [references/workflows.md](references/workflows.md) has complete worked examples of each (MCP call sequence + copy-paste REST curl):
 
 1. **Destination lookup → hotel search** (Booking): free-text city → `dest_id` → hotel list with prices and `hotel_id`s.
 2. **Hotel details & photos** (Booking): `hotel_id` → compact details / full signed photo gallery.
@@ -79,7 +75,7 @@ The six flows below cover most requests; [references/workflows.md](references/wo
 6. **Airbnb destination search, details & reviews**: destination → first-page listing cards, then `listing_id` → details (dates required) and reviews.
 7. **HolidayCheck hotel data**: hotel name → UUID search result → details or one fixed ten-review page; `recent_desc` for newest-first review collection.
 
-Everything beyond these — TripAdvisor, Google Travel deep-dives, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), OpenTable, Agoda, Trip.com, room-level rates, price calendars, private dining — is cataloged in [references/tools.md](references/tools.md): every MCP tool with its REST equivalent and per-platform gotchas. Read it whenever a request goes beyond the core flows.
+Everything beyond these — TripAdvisor, Google Travel deep-dives, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), OpenTable, Agoda, Trip.com, room-level rates, price calendars, private dining — is cataloged in [references/tools.md](references/tools.md). Prefer the connected server's discovered schema for MCP calls; use the catalog for REST equivalents and provider-specific constraints.
 
 ## Errors and backoff
 
@@ -90,24 +86,8 @@ REST errors are RFC 7807 `application/problem+json`; MCP tools return structured
 
 Transient upstream errors (`upstream_error`, HTTP 502/503) are usually worth one retry after a few seconds — these are live scrapes of third-party sites, not a static database.
 
-## Gotchas that bite agents
+## Constraints that change answers
 
-- **Currency codes are canonical uppercase** — StayAPI accepts lowercase or surrounding whitespace and normalizes it, but agents should send three-letter uppercase codes such as `USD` or `EUR`. Malformed values fail as REST `INVALID_CURRENCY` or MCP `invalid_input` before a provider call.
-- **Booking `dest_id` is signed** — city IDs are negative (Lisbon is `-2167973`). Stripping the minus silently returns 0 hotels with `success: true`. Preserve the sign end-to-end.
-- **Booking hotel URLs must be canonical**: `https://www.booking.com/hotel/{cc}/{slug}.html`. Search-result URLs are rejected with a 400.
-- **Booking destination lookup**: query the bare city name ("Savannah", not "Savannah, GA") — appending a region biases results to HOTEL-type matches. A HOTEL-type `dest_id` is that hotel's `hotel_id`.
-- **Prefer IDs over URLs on Booking** — URL resolution drives a real browser (5–40 s). Airbnb URL parsing is instant; Agoda URL resolution costs one quota unit (it fetches the page).
-- **Booking search prices are stay totals, not nightly rates**, and hotel rows nest at `data.hotels` (the envelope's top-level `hotel_id` is null on search). Results come in Booking's "recommended" ranking — there is no sort parameter, so "top by price/rating" means over-fetch and sort client-side.
-- **Sort parameter names differ per platform** — Booking and HolidayCheck `sort=recent_desc`, Airbnb `sort_by=MOST_RECENT`, Google reviews `sort_by=newest`, Agoda `sorting=7`. Check the workflow/catalog reference before assuming; the default is usually relevance, which silently fails "most recent" requests.
-- **Airbnb details require `check_in` and `check_out`**; pick near-future dates if the user doesn't care.
-- **Page-size caps**: Booking reviews 25/page · Airbnb reviews 50/page · HolidayCheck 10/page · Agoda 20/page · OpenTable 25/page · WeHotel 20/page · Accor reviews capped at 20 total (upstream limit).
-- **Airbnb search is first-page destination discovery** — use `airbnb_search_listings(location=...)`, not a listing title. Optional dates can qualify a displayed price; undated results omit prices, and search never confirms availability or exposes pagination.
-- **Trip.com reviews are paginated** — keep `page_size` generous to minimize calls.
-
-### Expedia rates (MCP) and Expedia / Vrbo discovery (REST)
-
-Use `expedia_hotel_rates` with a numeric `property_id`, ordered nonpast dates, and optional `children_ages` as a JSON integer array (up to six ages 0–17). Omit it or use `[]` for adults-only rates. Expedia discovery and reviews, and Vrbo, use REST.
-
-Resolve native destination region IDs, then pass required ordered stay dates to search. Expedia additionally provides regional property-name suggestions via `/v1/expedia/hotel/lookup`; Vrbo property-name lookup is unavailable. See [the tool catalog](references/tools.md#expedia) for continuation and dual Vrbo ID semantics. These search cards omit prices and never confirm availability.
-
-- **Booking families:** supply `children` plus exactly that many comma-separated `children_ages` (0–17). Price labels describe explicit anonymous rate markers; do not infer Genius discounts from property eligibility. Use only `fits_requested_occupancy: true` rates for full-family comparisons; prices summaries are per-room, not multi-room totals.
+Read [constraints.md](references/constraints.md) before reporting a price, handling
+children, choosing review sort/pagination, or treating a search result as availability.
+Those provider-specific limits prevent common but material mistakes.

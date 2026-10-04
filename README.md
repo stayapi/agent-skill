@@ -47,8 +47,10 @@ For live data, also add the StayAPI connector: **Settings → Connectors → Add
 skills/stayapi/
 ├── SKILL.md                  # triggers, auth rules, transport selection, core workflow guide
 └── references/
-    ├── workflows.md          # worked examples: destination lookup, search, details, reviews,
-    │                         # Google Hotels, Airbnb — MCP sequences + copy-paste REST curl
+    ├── agent-discovery.md    # capability discovery and endpoint selection
+    ├── constraints.md        # dates, occupancy, pagination, and platform limits
+    ├── identifiers.md        # platform identifier formats and resolution rules
+    ├── workflows.md          # worked MCP and REST workflows
     └── tools.md              # full MCP tool catalog and corresponding REST endpoints
 ```
 
