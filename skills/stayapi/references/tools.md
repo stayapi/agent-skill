@@ -210,7 +210,7 @@ Restaurant data. Search is coordinate-based — resolve place names with `meta_c
 | MCP tool | REST | What it does |
 |---|---|---|
 | `agoda_hotel_url_to_id` | `GET /v1/agoda/hotel/url-to-id` | Agoda hotel URL → numeric `hotel_id`. Costs one quota unit (real page fetch) — cache the id. First step. |
-| `agoda_hotel_prices` | `GET /v1/agoda/hotel/prices` | Live dated room availability, lowest whole-stay price, per-night/stay tax breakdowns, breakfast, cancellation, and inventory. A sold-out stay is a successful empty result. |
+| `agoda_hotel_prices` | `GET /v1/agoda/hotel/prices` | MCP `children_ages`: JSON integer array, up to nine ages 0–17; REST: CSV. Explicit ages override legacy `children` (default age 8); omitted/blank REST retains count, MCP `[]` means no children. Effective occupancy is echoed in `search`. Live dated room availability, lowest whole-stay price, per-night/stay tax breakdowns, breakfast, cancellation, and inventory. A sold-out stay is a successful empty result. |
 | `agoda_hotel_reviews` | `GET /v1/agoda/hotel/reviews/{hotel_id}` | Reviews aggregated across every provider Agoda syndicates. 20/page; `sorting`: `7` recent (default), `6` highest, `5` lowest. |
 | `agoda_hotel_review_comments` | `GET /v1/agoda/hotel/reviews/{hotel_id}/comments` | Same shape, one provider only — `provider_id` defaults to `3038` (Agoda's own). |
 
@@ -307,7 +307,7 @@ ChatGPT works in developer mode (web, paid plans): chatgpt.com/plugins → **+**
 | — | `GET /v1/expedia/destinations/lookup?query=` | Destination suggestions with numeric-string region IDs. |
 | — | `GET /v1/expedia/hotel/lookup?query=&region_id=` | Dateless HOTEL name suggestions in region context; property IDs compose with reviews/rates. |
 | — | `GET /v1/expedia/search?region_id=&check_in=&check_out=` | Dated primary cards. Required ordered dates, adults 1–8, offset 0–1000, limit 1–10; USD only, prices omitted. |
-| `expedia_hotel_rates` | `GET /v1/expedia/hotel/rates?property_id=&check_in=&check_out=` | Live room offers. MCP `children_ages` is a JSON integer array; REST uses comma-separated ages. Both accept up to six ages from 0–17; omit or use an empty MCP array for adults-only rates. Adults 1–10, ordered nonpast YYYY-MM-DD dates. Currency defaults to USD; other three-letter codes are accepted but conversion is not confirmed. Priced inventory or explicit sold-out empties are valid. |
+| `expedia_hotel_rates` | `GET /v1/expedia/hotel/rates?property_id=&check_in=&check_out=` | Live room offers. MCP `children_ages` is a JSON integer array; REST uses comma-separated ages. Both accept up to six ages from 0–17; omit or use an empty MCP array for adults-only rates. Adults 1–10, ordered nonpast YYYY-MM-DD dates. Currency defaults to USD; other three-letter codes are accepted but conversion is not confirmed. Finite nonnegative priced available inventory or explicit sold-out empties are valid; malformed or contradictory availability is a nonchargeable upstream error. |
 
 ## Vrbo
 
