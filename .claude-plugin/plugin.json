@@ -1,6 +1,6 @@
 {
   "name": "stayapi",
-  "description": "Live hotel, vacation-rental, and restaurant data from Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable through StayAPI — search, details, rooms, photos, reviews, and availability.",
+  "description": "Live hotel, vacation-rental, and restaurant data from Booking.com, Expedia, Vrbo, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable through StayAPI — search, details, rooms, photos, reviews, and availability.",
   "version": "0.1.22",
   "author": {
     "name": "StayAPI",
