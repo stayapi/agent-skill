@@ -197,13 +197,13 @@ Restaurant data. Search is coordinate-based — resolve place names with `meta_c
 | MCP tool | REST | What it does |
 |---|---|---|
 | `opentable_search_restaurants` | `GET /v1/opentable/search` | Restaurants near lat/lng for a date/time/party size. |
-| `opentable_restaurant_url_to_id` | `GET /v1/opentable/restaurant/url-to-id` | `/r/{slug}` URL → numeric `restaurant_id` (no browser — fast). |
+| `opentable_restaurant_url_to_id` | `GET /v1/opentable/restaurant/url-to-id` | `/r/{slug}` URL → numeric `restaurant_id` (reads the live page — a few seconds uncached, then cached). |
 | `opentable_restaurant_details` | `GET /v1/opentable/restaurants/{restaurant_id}` | Full normalized profile: identity, hours, photos, feature flags. |
 | `opentable_restaurant_menu` | `GET /v1/opentable/restaurant/menu` | Every published structured menu with items and prices. |
 | `opentable_restaurant_reviews` | `GET /v1/opentable/restaurant/reviews` | Paginated reviews (≤25/page), `newest`/`highest`/`lowest`. |
 | `opentable_restaurant_availability` | `GET /v1/opentable/restaurants/{restaurant_id}/availability` | Is one exact time bookable for date + party size. |
 | `opentable_restaurant_availability_slots` | `GET /v1/opentable/restaurants/{restaurant_id}/availability/slots` | Nearby bookable `HH:MM` slots around a preferred time. |
-| `opentable_private_dining_restaurants` | `GET /v1/opentable/private-dining` | Private-dining venues near lat/lng with capacity + direct contact; `with_facets=true` reveals cuisine UUID filters. |
+| `opentable_private_dining_restaurants` | `GET /v1/opentable/private-dining` | Private-dining venues near lat/lng with capacity and the venue's private-dining page (the event contact's name/phone/email are REST-only); `with_facets=true` reveals cuisine UUID filters. |
 
 ## Agoda
 
@@ -307,6 +307,7 @@ ChatGPT works in developer mode (web, paid plans): chatgpt.com/plugins → **+**
 | — | `GET /v1/expedia/destinations/lookup?query=` | Destination suggestions with numeric-string region IDs. |
 | — | `GET /v1/expedia/hotel/lookup?query=&region_id=` | Dateless HOTEL name suggestions in region context; property IDs compose with reviews/rates. |
 | — | `GET /v1/expedia/search?region_id=&check_in=&check_out=` | Dated primary cards. Required ordered dates, adults 1–8, offset 0–1000, limit 1–10; USD only, prices omitted. |
+| — | `GET /v1/expedia/hotel/rates?property_id=&check_in=&check_out=` | Live room offers. Optional comma-separated `children_ages` accepts up to six ages from 0–17; omit it for adults-only rates. Priced inventory or explicit sold-out empties are valid. |
 
 ## Vrbo
 
