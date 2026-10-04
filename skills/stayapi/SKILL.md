@@ -2,7 +2,7 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Expedia, Vrbo, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.22
+  version: 0.1.23
 ---
 
 # StayAPI — Live Hotel & Travel Data
@@ -102,8 +102,10 @@ Transient upstream errors (`upstream_error`, HTTP 502/503) are usually worth one
 - **Airbnb details require `check_in` and `check_out`**; pick near-future dates if the user doesn't care.
 - **Page-size caps**: Booking reviews 25/page · Airbnb reviews 50/page · HolidayCheck 10/page · Agoda 20/page · OpenTable 25/page · WeHotel 20/page · Accor reviews capped at 20 total (upstream limit).
 - **Airbnb search is first-page destination discovery** — use `airbnb_search_listings(location=...)`, not a listing title. Optional dates can qualify a displayed price; undated results omit prices, and search never confirms availability or exposes pagination.
-- **Trip.com reviews are slow by design** (a real browser defeats bot detection) — expect several seconds per page and keep `page_size` generous to minimize calls.
+- **Trip.com reviews are paginated** — keep `page_size` generous to minimize calls.
 
-### Expedia and Vrbo discovery (REST)
+### Expedia rates (MCP) and Expedia / Vrbo discovery (REST)
+
+Use `expedia_hotel_rates` with a numeric `property_id`, ordered nonpast dates, and optional `children_ages` as a JSON integer array (up to six ages 0–17). Omit it or use `[]` for adults-only rates. Expedia discovery and reviews, and Vrbo, use REST.
 
 Resolve native destination region IDs, then pass required ordered stay dates to search. Expedia additionally provides regional property-name suggestions via `/v1/expedia/hotel/lookup`; Vrbo property-name lookup is unavailable. See [the tool catalog](references/tools.md#expedia) for continuation and dual Vrbo ID semantics. These search cards omit prices and never confirm availability.
