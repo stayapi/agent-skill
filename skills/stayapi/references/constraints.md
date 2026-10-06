@@ -10,6 +10,7 @@
   full-family comparison; price summaries are per room.
 - Booking rate labels describe explicit anonymous rate markers. Treat a Genius label as
   evidence that a returned rate applied it, never as evidence of hotel eligibility.
+- Airbnb listing IDs must remain decimal strings end to end. Send MCP `listing_id` as a quoted string for 19-digit values; legacy numeric inputs stop at `9007199254740991`.
 - Airbnb details require paired dates. Airbnb search is first-page destination discovery,
   with optional date-qualified displayed prices only; it never confirms availability.
 - Expedia rates require a numeric `property_id`, ordered nonpast dates, and optional

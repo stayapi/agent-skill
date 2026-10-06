@@ -44,6 +44,8 @@ Canonical URL shape (anything else is a 400): `https://www.booking.com/hotel/{cc
 
 ## Airbnb
 
+Airbnb `listing_id` values in REST and MCP responses are decimal strings, including nested listing data and error extensions, preserving all digits of 19-digit IDs. Keep IDs as strings in clients. REST paths accept the full decimal text. MCP accepts positive decimal strings (preferred) or legacy integer numbers up to `9007199254740991`; larger numbers, floats, and booleans are rejected. For example, pass `listing_id="1234567890123456789"`, never a JavaScript `Number` conversion.
+
 | MCP tool | REST | What it does |
 |---|---|---|
 | `airbnb_search_listings` | `GET /v1/airbnb/search?location=` | First-page destination listings. Optional paired dates; undated results omit prices and neither mode verifies availability. No property-name lookup or pagination. |
