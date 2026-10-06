@@ -149,7 +149,7 @@ Details that matter for review requests:
 - **Edited reviews reorder by edit time**, while `iso_date` keeps the *original* post date — a review "edited 6 hours ago" can carry `iso_date: 2018-…`. A paginate-until-cutoff backfill on Google reviews must tolerate these outliers rather than stopping at the first old `iso_date`.
 - **Two Google review surfaces exist**: this one (`google_reviews_for_place`) is Google Maps place reviews and works for any place type — hotels, restaurants, attractions. `google_travel_reviews` is Google's hotel-only Travel surface (entity_token-keyed, supports topic filters). For a hotel either works: answer "Google reviews for X" with this one; use the travel one when you're already holding an `entity_token` or need topic/text filtering. See [tools.md](tools.md#google-travel).
 
-## 6. Airbnb destination search, listing details & reviews
+## 6. Airbnb destination search, listing details, reviews & calendar
 
 Use destination search when the user needs listings; it is not a property-name lookup and returns the first page only. Airbnb URL→ID is an instant regex — passing a URL costs nothing extra.
 
@@ -165,7 +165,7 @@ curl -sS "${AUTH[@]}" --get "$BASE/v1/airbnb/search" \
 
 `page_scope` is always `first_page`, `availability_verified` is always false, and no cursor is returned. A dated result exposes `displayed_price` only when `price_applies_to_requested_dates=true`; an undated result omits all prices.
 
-**MCP**: `airbnb_listing_details(url="https://www.airbnb.com/rooms/22120898", check_in=..., check_out=...)` · `airbnb_listing_reviews(listing_id=22120898, sort_by="MOST_RECENT")`
+**MCP**: `airbnb_listing_details(url="https://www.airbnb.com/rooms/22120898", check_in=..., check_out=...)` · `airbnb_listing_reviews(listing_id=22120898, sort_by="MOST_RECENT")` · `airbnb_listing_calendar(listing_id=22120898, months=3)`
 
 **REST**:
 

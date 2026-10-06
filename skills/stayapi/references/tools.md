@@ -49,8 +49,9 @@ Canonical URL shape (anything else is a 400): `https://www.booking.com/hotel/{cc
 | `airbnb_search_listings` | `GET /v1/airbnb/search?location=` | First-page destination listings. Optional paired dates; undated results omit prices and neither mode verifies availability. No property-name lookup or pagination. |
 | `airbnb_listing_details` | `GET /v1/airbnb/listing/{id}/details` or `/v1/airbnb/listing/details-from-url?url=` | Listing details. `check_in`/`check_out` required. URL parsing is instant. |
 | `airbnb_listing_reviews` | `GET /v1/airbnb/listing/reviews/{id}` or `/v1/airbnb/listing/reviews-from-url?url=` | Reviews, up to 50/page, `sort_by=BEST_QUALITY\|MOST_RECENT`. |
+| `airbnb_listing_calendar` | `GET /v1/airbnb/listing/{id}/calendar` or `/v1/airbnb/listing/calendar-from-url?url=` | Daily availability from this month; `months=1..12` (default 12). No price quote. |
 
-REST also has per-listing `pricing`, `calendar`, `cancellation-policy`, `payment-methods`, and `extract-id`.
+REST also has per-listing `pricing`, `cancellation-policy`, `payment-methods`, and `extract-id`.
 
 ## Google Hotels
 
@@ -203,7 +204,7 @@ Restaurant data. Search is coordinate-based — resolve place names with `meta_c
 | `opentable_restaurant_reviews` | `GET /v1/opentable/restaurant/reviews` | Paginated reviews (≤25/page), `newest`/`highest`/`lowest`. |
 | `opentable_restaurant_availability` | `GET /v1/opentable/restaurants/{restaurant_id}/availability` | Is one exact time bookable for date + party size. |
 | `opentable_restaurant_availability_slots` | `GET /v1/opentable/restaurants/{restaurant_id}/availability/slots` | Nearby bookable `HH:MM` slots around a preferred time. |
-| `opentable_private_dining_restaurants` | `GET /v1/opentable/private-dining` | Private-dining venues near lat/lng with capacity and the venue's private-dining page (the event contact's name/phone/email are REST-only); `with_facets=true` reveals cuisine UUID filters. |
+| `opentable_private_dining_restaurants` | `GET /v1/opentable/private-dining` | Private-dining venues near lat/lng with capacity and the venue's private-dining page (the event contact's name/phone/email are REST-only); `with_facets=true` reveals cuisine UUID filters. `min_capacity` scans 250 venues per call; if `capacity_filter_truncated`, call again with `scan_offset=next_scan_offset`. |
 
 ## Agoda
 
