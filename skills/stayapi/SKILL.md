@@ -2,7 +2,7 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Expedia, Vrbo, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.32
+  version: 0.1.33
 ---
 
 # StayAPI — Live Hotel & Travel Data
@@ -79,7 +79,7 @@ The core flows below cover most requests; [references/workflows.md](references/w
 6. **Airbnb destination search, details, reviews & calendar**: destination → first-page listing cards, then `listing_id` → details (dates required), reviews, or 1–12 months of daily availability.
 7. **HolidayCheck hotel data**: hotel name → UUID search result → details or one fixed ten-review page; `recent_desc` for newest-first review collection.
 
-For dated Agoda city discovery, use `agoda_search_hotels` with a numeric city ID and stay dates. For an Agoda hotel name, use `agoda_hotel_lookup` and select a candidate ID before prices or reviews. Use `agoda_hotel_url_to_id` when you have a hotel URL.
+For dated Agoda city discovery, use `agoda_search_hotels` with a numeric city ID and stay dates. For an Agoda hotel name, use `agoda_hotel_lookup` and select a candidate ID before details, prices or reviews. Use `agoda_hotel_details` for date-free source address, description, amenities and photos; respect its explicit obfuscated-address flag. Use `agoda_hotel_url_to_id` when you have a hotel URL.
 
 Everything beyond these — TripAdvisor, Google Travel deep-dives, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), OpenTable, Agoda, Trip.com, room-level rates, price calendars, private dining — is cataloged in [references/tools.md](references/tools.md). Prefer the connected server's discovered schema for MCP calls; use the catalog for REST equivalents and provider-specific constraints.
 
