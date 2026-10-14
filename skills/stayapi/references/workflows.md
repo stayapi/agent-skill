@@ -282,3 +282,11 @@ translation guarantee. Owner replies are not returned.
 Call `agoda_hotel_lookup(query="Banyan Tree Phuket")`, inspect the candidate names and locations, then pass the selected `hotel_id` to `agoda_hotel_prices` with dates or to the review tools. Lookup suggestions have no pagination and do not establish availability. When the caller already has a hotel URL, use `agoda_hotel_url_to_id` instead.
 
 For destination discovery, use `agoda_search_hotels(city_id=16056, check_in="2027-05-15", check_out="2027-05-17")`. Choose dates appropriate to the current date and pass explicit occupancy. Paginate with page; inspect returned_count and total_filtered_hotels without inventing has_more. An unavailable card has null prices; lookup by name does not establish availability.
+
+## Trip.com city search to reviews
+
+Use `tripcom_search_hotels` with a Trip.com city ID, required stay dates,
+currency, adults and rooms. Only the first page is supported (up to 10 cards);
+children are unsupported. Treat missing `price` as unknown, not sold out.
+Compare source quoted payment amounts with their labels and `notes` for local charges; do not multiply rounded advertised
+amounts. Pass a selected `hotel_id` to `tripcom_hotel_reviews` for guest context.

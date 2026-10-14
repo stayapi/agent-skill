@@ -223,6 +223,7 @@ Restaurant data. Search is coordinate-based — resolve place names with `meta_c
 
 | MCP tool | REST | What it does |
 |---|---|---|
+| `tripcom_search_hotels` | `GET /v1/tripcom/hotels/search` | Positive Trip.com `city_id` and required `check_in`/`check_out`; USD default, adults 2/rooms 1 (1–6), limit 10 (1–10). First page only, no children. Nullable `price`: displayed advertised amount has unspecified tax inclusion; use source `total_amount` with its label and `notes` for local charges, never multiply rounded display prices. Returned hotel IDs feed reviews. |
 | `tripcom_hotel_reviews` | `GET /v1/tripcom/hotel/reviews/{hotel_id}` | Paginated reviews (`page_size` 1–50). Drives a real browser — several seconds per call; use large pages. |
 
 ## Meta (geocoding)
