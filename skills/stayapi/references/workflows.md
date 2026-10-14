@@ -290,3 +290,8 @@ currency, adults and rooms. Only the first page is supported (up to 10 cards);
 children are unsupported. Treat missing `price` as unknown, not sold out.
 Compare source quoted payment amounts with their labels and `notes` for local charges; do not multiply rounded advertised
 amounts. Pass a selected `hotel_id` to `tripcom_hotel_reviews` for guest context.
+
+For Trip.com search, use `selected_room` as the card's selected offer, not full
+room inventory. Preserve room names, bed text and source labels; displayed
+guests are not capacity. Treat original prices as source crossed-out values,
+and never infer refundability, breakfast or smoking policies from absent labels.
