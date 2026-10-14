@@ -15,6 +15,8 @@ next call. IDs are provider-specific; a search card is not a confirmed booking.
 | Google Maps place | `google_reviews_for_place(query=...)` | Returned `data_id` for review pagination. |
 | Place coordinates | `meta_coordinates_lookup` | Latitude/longitude for OpenTable and Accor. |
 | TripAdvisor place/URL | `tripadvisor_geo_search` or pass URL | `geo_id` / `location_id`. |
+| Agoda hotel name | `agoda_hotel_lookup` | Select a candidate numeric `hotel_id`; suggestions are not dated availability. |
+| Agoda city ID and stay | `agoda_search_hotels` | Hotel IDs from dated ranked cards; preserve source prices and pagination counts. |
 | Agoda, Radisson, OpenTable, WeHotel URL | Provider `*_url_to_id` tool | Provider-specific ID. |
 | HolidayCheck hotel name/URL | `holidaycheck_hotels_search` / `holidaycheck_hotel_url_to_id` | Lowercase UUID. |
 | Marriott property | `marriott_bonvoy_search` by coordinates | `property_id` for rooms. |

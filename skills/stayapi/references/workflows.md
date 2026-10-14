@@ -276,3 +276,9 @@ translation guarantee. Owner replies are not returned.
 1. Call the provider's `/destinations/lookup?query=` and preserve the selected `region_id` as a string.
 2. Call `/search` with region ID, required check-in/check-out and adults; follow the returned continuation pair. Cards are discovery, not confirmed availability; prices are omitted and search currency is USD.
 3. For Expedia property-name requests, use `/hotel/lookup?query=&region_id=` and pass the selected property ID to REST reviews or `expedia_hotel_rates` with stay dates. For children, pass `children_ages=[5, 8]` to MCP (REST rates use `children_ages=5,8`). Vrbo has no verified native property-name resolver. Its search returns internal `property_id` for reviews separately from the public `listing_id` in canonical URLs.
+
+## Agoda hotel name to prices or reviews
+
+Call `agoda_hotel_lookup(query="Banyan Tree Phuket")`, inspect the candidate names and locations, then pass the selected `hotel_id` to `agoda_hotel_prices` with dates or to the review tools. Lookup suggestions have no pagination and do not establish availability. When the caller already has a hotel URL, use `agoda_hotel_url_to_id` instead.
+
+For destination discovery, use `agoda_search_hotels(city_id=16056, check_in="2027-05-15", check_out="2027-05-17")`. Choose dates appropriate to the current date and pass explicit occupancy. Paginate with page; inspect returned_count and total_filtered_hotels without inventing has_more. An unavailable card has null prices; lookup by name does not establish availability.
