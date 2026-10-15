@@ -286,7 +286,7 @@ translation guarantee. Owner replies are not returned.
 
 ## Agoda hotel name to details, prices or reviews
 
-Call `agoda_hotel_lookup(query="Banyan Tree Phuket")`, inspect the candidate names and locations, then pass the selected `hotel_id` to `agoda_hotel_details` for date-free source address and metadata, or to `agoda_hotel_prices` with dates or to the review tools. Lookup suggestions have no pagination and do not establish availability. When the caller already has a hotel URL, use `agoda_hotel_url_to_id` instead.
+Call `agoda_hotel_lookup(query="Banyan Tree Phuket")`, inspect the candidate names and locations, then pass the selected `hotel_id` to `agoda_hotel_details` for date-free source address, metadata and useful_information. Report null room counts/opening years as unavailable; never infer them from room offers or descriptions. Use `agoda_hotel_prices` with dates for availability, or pass the ID to the review tools. Lookup suggestions have no pagination and do not establish availability. When the caller already has a hotel URL, use `agoda_hotel_url_to_id` instead.
 
 For destination discovery, use `agoda_search_hotels(city_id=16056, check_in="2027-05-15", check_out="2027-05-17")`. Choose dates appropriate to the current date and pass explicit occupancy. Paginate with page; inspect returned_count and total_filtered_hotels without inventing has_more. An unavailable card has null prices; lookup by name does not establish availability.
 
