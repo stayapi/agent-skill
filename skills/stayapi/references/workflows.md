@@ -213,6 +213,13 @@ empty, but every returned room has a verified offer. `members_only` and
 `login_required` describe booking restrictions; no Hilton login is needed to
 retrieve quotes. Never infer mixed-payment costs or fifth-night benefits.
 
+Check `availability_status` before interpreting offers. `unavailable` is a
+successful completed query with `room_types: []`, `total: 0`, and an explanatory
+`availability_message`; `native_currency` may be null. Report no availability
+for that stay without claiming the cause is sold out. Offer other dates or
+properties if useful; do not retry the same query as a provider error. Unknown
+or malformed availability still fails and follows the normal error policy.
+
 ## 8. Otelpuan hotel → dated room offers or reviews
 
 Use text autocomplete when the caller has a hotel name. For a dated room quote,
