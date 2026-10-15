@@ -312,7 +312,7 @@ ChatGPT works in developer mode (web, paid plans): chatgpt.com/plugins → **+**
 | MCP tool | REST | What it does |
 |---|---|---|
 | — | `GET /v1/expedia/destinations/lookup?query=` | Destination suggestions with numeric-string region IDs. |
-| — | `GET /v1/expedia/hotel/lookup?query=&region_id=` | Dateless HOTEL name suggestions in region context; property IDs compose with reviews/rates. |
+| — | `GET /v1/expedia/hotel/lookup?query=&region_id=` | Dateless HOTEL name suggestions in region context; property IDs compose with reviews/rates. Verified no matches return HTTP 200, `properties: []`, `count: 0`; upstream failures remain errors. |
 | — | `GET /v1/expedia/search?region_id=&check_in=&check_out=` | Dated primary cards. Required ordered dates, adults 1–8, offset 0–1000, limit 1–10; USD only, prices omitted. |
 | — | `GET /v1/expedia/hotel/details?property_id=` | Undated verified identity and available metadata. The numeric Expedia property URL may redirect. No dates, prices, or availability. |
 | `expedia_hotel_rates` | `GET /v1/expedia/hotel/rates?property_id=&check_in=&check_out=` | Live room offers. MCP `children_ages` is a JSON integer array; REST uses comma-separated ages. Both accept up to six ages from 0–17; omit or use an empty MCP array for adults-only rates. Adults 1–10, ordered nonpast YYYY-MM-DD dates. Currency defaults to USD; other three-letter codes are accepted but conversion is not confirmed. Finite nonnegative priced available inventory or explicit sold-out empties are valid; malformed or contradictory availability is a nonchargeable upstream error. |
