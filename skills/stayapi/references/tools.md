@@ -217,14 +217,18 @@ Restaurant data. Search is coordinate-based — resolve place names with `meta_c
 | `agoda_hotel_lookup` | `GET /v1/agoda/hotel/lookup?query=` | Hotel-name suggestions, optionally including location. Query 2–200 trimmed characters, no controls; select a candidate hotel_id. No pagination, prices, availability, or exhaustive-match guarantee. |
 | `agoda_hotel_url_to_id` | `GET /v1/agoda/hotel/url-to-id` | Agoda hotel URL → numeric `hotel_id`. Costs one quota unit (real page fetch) — cache the id. Use hotel_lookup for names. |
 | `agoda_hotel_prices` | `GET /v1/agoda/hotel/prices` | MCP `children_ages`: JSON integer array, up to nine ages 0–17; REST: CSV. Explicit ages override legacy `children` (default age 8); omitted/blank REST retains count, MCP `[]` means no children. Effective occupancy is echoed in `search`. Live dated room availability, lowest whole-stay price, per-night/stay tax breakdowns, breakfast, cancellation, and inventory. A sold-out stay is a successful empty result. |
-| `agoda_hotel_reviews` | `GET /v1/agoda/hotel/reviews/{hotel_id}` | Reviews aggregated across every provider Agoda syndicates. 20/page; `sorting`: `7` recent (default), `6` highest, `5` lowest. |
-| `agoda_hotel_review_comments` | `GET /v1/agoda/hotel/reviews/{hotel_id}/comments` | Same shape, one provider only — `provider_id` defaults to `3038` (Agoda's own). |
+| `agoda_hotel_reviews` | `GET /v1/agoda/hotel/reviews/{hotel_id}` | Reviews aggregated across every provider Agoda syndicates. Requested page size 20; actual counts can differ; `sorting`: `7` recent (default), `6` highest, `5` lowest. |
+| `agoda_hotel_review_comments` | `GET /v1/agoda/hotel/reviews/{hotel_id}/comments` | Same shape; requests a provider preference, but results may include mixed sources — `provider_id` defaults to `3038` (Agoda's own). |
+
+The requested page size is 20; returned counts can differ. Sorting is a provider preference, not a guarantee of global date/rating order across mixed provider or language groups or pages. Do not stop date-range backfills at the first old review. Advertised total counts do not guarantee that every review is accessible.
+
+Agoda review responses include nullable `owner_response` objects with nullable `text`, `published_date`, and `author` strings. Reply dates retain source formatting. `review_score` preserves the source aggregate (`overall`, `score_text`, `review_count`), never a page average; missing aggregates can be `{}` or null, including provider comments.
 
 ## Trip.com
 
 | MCP tool | REST | What it does |
 |---|---|---|
-| `tripcom_search_hotels` | `GET /v1/tripcom/hotels/search` | Positive Trip.com `city_id` and required `check_in`/`check_out`; USD default, adults 2/rooms 1 (1–6), limit 10 (1–10). First page only, no children. Nullable `price`: displayed advertised amount has unspecified tax inclusion; use source `total_amount` with its label and `notes` for local charges, never multiply rounded display prices. Returned hotel IDs feed reviews.  Selected-room names/beds/displayed guests/labels and hotel-card context are source descriptions, not policy or capacity guarantees. Crossed-out prices are source values. |
+| `tripcom_search_hotels` | `GET /v1/tripcom/hotels/search` | Positive Trip.com `city_id` and required `check_in`/`check_out`; USD default, adults 2/rooms 1 (1–6), limit 10 (1–20). Optional `hotel_name` (trimmed 1–200 characters, no control characters) requests a native name keyword within the required city/stay; returned `hotel_name` is normalized or null. First page only, no children. Nullable `price`: displayed advertised amount has unspecified tax inclusion; use source `total_amount` with its label and `notes` for local charges, never multiply rounded display prices. Returned hotel IDs feed reviews.  Selected-room names/beds/displayed guests/labels and hotel-card context are source descriptions, not policy or capacity guarantees. Crossed-out prices are source values. |
 | `tripcom_hotel_reviews` | `GET /v1/tripcom/hotel/reviews/{hotel_id}` | Paginated reviews (`page_size` 1–50). Drives a real browser — several seconds per call; use large pages. |
 
 ## Meta (geocoding)
@@ -324,7 +328,7 @@ ChatGPT works in developer mode (web, paid plans): chatgpt.com/plugins → **+**
 | — | `GET /v1/vrbo/destinations/lookup?query=` | Native destination region IDs. |
 | — | `GET /v1/vrbo/search?region_id=&check_in=&check_out=` | Dated discovery; same date/adult/page/USD bounds as Expedia. Internal `property_id` is for reviews; public `listing_id` (possibly ending in `ha`) is for URLs. |
 
-For both providers, search responses (and Expedia property-name lookup) report `availability_verified: false`; destination suggestions do not carry that field. Continue only using `next_offset`/`next_limit`, never infer completeness from count. Native Vrbo property-name lookup is not available; do not substitute a search engine or fabricate a resolver. Expedia exposes only `expedia_hotel_rates` through MCP; Expedia discovery/details/reviews and all Vrbo operations use REST.
+For both providers, search responses (and Expedia property-name lookup) report `availability_verified: false`; destination suggestions do not carry that field. Continue only using `next_offset`/`next_limit`, never infer completeness from count. Expedia review items include nullable `owner_response` objects (`text`, `published_date`, `author`, all nullable strings); only the first management reply is returned and its date retains source formatting. Native Vrbo property-name lookup is not available; do not substitute a search engine or fabricate a resolver. Expedia exposes only `expedia_hotel_rates` through MCP; Expedia discovery/details/reviews and all Vrbo operations use REST.
 
 ### Booking family rates and labels
 
@@ -344,3 +348,5 @@ not a combined multi-room reservation total. See the public Booking endpoint doc
 ### Booking point-of-sale options
 
 `booking_search_hotels` and `booking_hotel_rooms` accept optional ISO `market` (ES: es/EUR; US: en-us/USD), `language`, and `currency`. Explicit display overrides win. Legacy `country_market` retains en-us/USD defaults and must match `market` if both are supplied. Other configured defaults and fallback are documented in the Booking endpoint reference. Compare identical occupancy, stay, currency and room/rate; tax-inclusive versus tax-exclusive headlines are not discounts. `effective_market` reports requested_country, nullable targeted_country, language, currency, country_verified=false and verified_country=null. Targeting is best-effort, not verified geography.
+
+For Agoda provider comments, absent aggregates serialize as `review_score: null` in REST; the MCP comments result may omit `review_score`. Never infer it from a page.
