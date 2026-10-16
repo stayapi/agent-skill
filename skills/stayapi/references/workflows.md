@@ -293,7 +293,7 @@ For destination discovery, use `agoda_search_hotels(city_id=16056, check_in="202
 ## Trip.com city search to reviews
 
 Use `tripcom_search_hotels` with a Trip.com city ID, required stay dates,
-currency, adults and rooms. Only the first page is supported (up to 10 cards);
+currency, adults and rooms. Optionally pass `hotel_name` for a native name keyword within that city/stay. Only the first page is supported (up to 20 cards);
 children are unsupported. Treat missing `price` as unknown, not sold out.
 Compare source quoted payment amounts with their labels and `notes` for local charges; do not multiply rounded advertised
 amounts. Pass a selected `hotel_id` to `tripcom_hotel_reviews` for guest context.
