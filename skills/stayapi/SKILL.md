@@ -2,7 +2,7 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Expedia, Vrbo, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.43
+  version: 0.1.44
 ---
 
 # StayAPI — Live Hotel & Travel Data
@@ -105,3 +105,5 @@ children, choosing review sort/pagination, or treating a search result as availa
 Those provider-specific limits prevent common but material mistakes.
 
 Airbnb listing IDs: preserve decimal strings end to end. Send MCP `listing_id` as a quoted decimal string, especially for 19-digit IDs; legacy numeric inputs are limited to 9007199254740991.
+
+For Ctrip destination lookup (REST-only), preserve `resolution` and `matched_place_*` provenance. A `parent_city` result returns the containing Ctrip hotel-search city; do not label its ID as the queried resort or assume it is a legal municipality. Conflicting parent cities require selection (409).
