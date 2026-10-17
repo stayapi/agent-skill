@@ -142,12 +142,13 @@ Covers Sofitel, Fairmont, Novotel, Ibis, and other Accor brands. Search takes `l
 
 ## Marriott Bonvoy
 
-Brand.com search and live room rates with Bonvoy award pricing. No URL resolver: `marriott_bonvoy_search` returns the `property_id` codes (e.g. `NYCXR`) that `marriott_bonvoy_rooms` takes.
+Brand.com search, live room rates and a per-date price calendar, with Bonvoy award pricing. No URL resolver: `marriott_bonvoy_search` returns the `property_id` codes (e.g. `NYCXR`) that `marriott_bonvoy_rooms` and `marriott_bonvoy_price_calendar` take.
 
 | MCP tool | REST | What it does |
 |---|---|---|
-| `marriott_bonvoy_search` | `GET /v1/marriott/bonvoy/search` | Properties near `latitude`/`longitude` for a stay: `property_id`, brand, rating, distance, lowest cash price, `points_per_night`. 20/page via `offset`; `sort_by` `DISTANCE` or `PRICE`; optional `corporate_code`. |
+| `marriott_bonvoy_search` | `GET /v1/marriott/bonvoy/search` | Properties near `latitude`/`longitude` for a stay: `property_id`, brand, rating, distance, lowest cash price, `points_per_night`. 20/page via `offset`; `sort_by` `DISTANCE` or `PRICE`; optional `corporate_code`. Without `corporate_only` a hotel lacking a code rate shows its regular price; `corporate_only=true` (requires `corporate_code`) keeps only hotels with a rate under the code, priced at it. |
 | `marriott_bonvoy_rooms` | `GET /v1/marriott/bonvoy/rooms` | Room types and rate plans for one `property_id` and stay, cash and award. **`points` and `per_night` are the check-in night only** — use `points_total` (whole stay, matches marriott.com) or `total` (cash incl. taxes/fees), or sum `nightly_rates` (one `{date, cash, points, free_night}` per night). A room can list several award plans at different prices; key on `rate_plan_code`. |
+| `marriott_bonvoy_price_calendar` | `GET /v1/marriott/bonvoy/price-calendar` | Lowest rate per check-in date for one `property_id`, `date_from`..`date_to` inclusive (≤ 35 days apart, so ≤ 36 dates), each priced for `nights` (1–9). Every date is listed; `available: false` means no rate (prices null). `per_night` = average nightly, `stay_total` = stay, both before taxes/fees, in the property's own currency (no conversion). `corporate_code` returns ONLY rates under the code (unknown code → all dates unavailable). `use_points=true` → `points_total` for the whole stay, cash null; not combinable with `corporate_code`. Unknown property → 404. |
 
 ## Hilton
 

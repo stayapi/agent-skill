@@ -21,6 +21,7 @@ Dates in examples are placeholders — always use dates in the future, and pass 
 7. [Hilton property → dated cash and full-points rewards](#7-hilton-property--dated-cash-and-full-points-rewards)
 8. [Otelpuan hotel → dated room offers or reviews](#8-otelpuan-hotel--dated-room-offers-or-reviews)
 9. [HolidayCheck name → details or reviews](#9-holidaycheck-name--details-or-reviews)
+10. [Marriott flexible dates → cheapest check-in dates](#10-marriott-flexible-dates--cheapest-check-in-dates)
 
 ---
 
@@ -277,6 +278,32 @@ the default, while `recent_desc` is newest-first and paginates with `has_more`.
 A supplied `review_date` is HolidayCheck's entry timestamp and `stay_date` is a
 separate month. `original_language` and `language` are source locales, not a
 translation guarantee. Owner replies are not returned.
+
+## 10. Marriott flexible dates → cheapest check-in dates
+
+Use when the user has a date window rather than fixed dates ("cheapest 3 nights
+in Los Angeles in November with our MMP code"). There is no flexible-dates
+endpoint: search once for property codes, then call the price calendar once per
+property with the same code.
+
+**MCP**: `marriott_bonvoy_search(latitude=34.045, longitude=-118.267, check_in="2027-11-01", check_out="2027-11-04", corporate_code="MMP", corporate_only=true)` → for each chosen `property_id`: `marriott_bonvoy_price_calendar(property_id="LAXJW", date_from="2027-11-01", date_to="2027-11-30", nights=3, corporate_code="MMP")` → confirm the pick with `marriott_bonvoy_rooms`.
+
+**REST**:
+
+```bash
+curl -sS "${AUTH[@]}" "$BASE/v1/marriott/bonvoy/search?latitude=34.045&longitude=-118.267\
+&check_in=2027-11-01&check_out=2027-11-04&corporate_code=MMP&corporate_only=true"
+curl -sS "${AUTH[@]}" "$BASE/v1/marriott/bonvoy/price-calendar?property_id=LAXJW\
+&date_from=2027-11-01&date_to=2027-11-30&nights=3&corporate_code=MMP"
+```
+
+One calendar call covers up to 36 check-in dates (`date_to` at most 35 days
+after `date_from`); split longer windows. Rank only `available: true` dates by
+`stay_total` (cash, before taxes and fees, property currency) or `points_total`
+(whole stay, with `use_points=true` and no `corporate_code`). With a
+`corporate_code`, every available date is priced under that code; an all-false
+calendar means the property has no rate under it for that window, not an error.
+Each call costs one credit, so budget one per property per window.
 
 ## Native Expedia / Vrbo destination discovery
 
