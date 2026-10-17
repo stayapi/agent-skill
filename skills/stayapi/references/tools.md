@@ -229,7 +229,9 @@ Agoda review responses include nullable `owner_response` objects with nullable `
 | MCP tool | REST | What it does |
 |---|---|---|
 | `tripcom_search_hotels` | `GET /v1/tripcom/hotels/search` | Positive Trip.com `city_id` and required `check_in`/`check_out`; USD default, adults 2/rooms 1 (1–6), limit 10 (1–20). Optional `hotel_name` (trimmed 1–200 characters, no control characters) requests a native name keyword within the required city/stay; returned `hotel_name` is normalized or null. First page only, no children. Nullable `price`: displayed advertised amount has unspecified tax inclusion; use source `total_amount` with its label and `notes` for local charges, never multiply rounded display prices. Returned hotel IDs feed reviews.  Selected-room names/beds/displayed guests/labels and hotel-card context are source descriptions, not policy or capacity guarantees. Crossed-out prices are source values. |
-| `tripcom_hotel_reviews` | `GET /v1/tripcom/hotel/reviews/{hotel_id}` | Paginated reviews (`page_size` 1–50). Drives a real browser — several seconds per call; use large pages. |
+| `tripcom_hotel_reviews` | `GET /v1/tripcom/hotel/reviews/{hotel_id}` | Paginated reviews (`page_size` 1–50) through the async comment-info API and residential proxy. Per-review `source`: `tripcom`, `ctrip`, `expedia`, `hotelscom`, or `unknown`. Aggregate Expedia ratings do not prove row provenance; upstream credential fields are removed. |
+
+Ctrip destination lookup is REST-only: `GET /v1/ctrip/destinations/lookup?query=Hangzhou&country=China`. The optional `country` is an exact English or localized country name. Ambiguous cities return 409 with candidates; regions return 422 with typed municipality suggestions. Select a verified city ID before hotel search; lowering `limit` does not force a match.
 
 ## Meta (geocoding)
 
