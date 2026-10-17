@@ -2,7 +2,7 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Expedia, Vrbo, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.42
+  version: 0.1.43
 ---
 
 # StayAPI — Live Hotel & Travel Data
@@ -84,8 +84,10 @@ For dated Agoda city discovery, use `agoda_search_hotels` with a numeric city ID
 Everything beyond these — TripAdvisor, Google Travel deep-dives, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), OpenTable, Agoda, Trip.com, room-level rates, price calendars, private dining — is cataloged in [references/tools.md](references/tools.md). Prefer the connected server's discovered schema for MCP calls; use the catalog for REST equivalents and provider-specific constraints.
 
 Trip.com/Ctrip review rows may be syndicated. Preserve each review's `source`
-(`tripcom`, `ctrip`, `expedia`, `hotelscom`, or `unknown`); aggregate Expedia
-rating metadata does not identify the origin of an individual review.
+(`tripcom`, `ctrip`, `expedia`, `hotelscom`, `tripadvisor`, or `unknown`); aggregate Expedia
+rating metadata does not identify the origin of an individual review. `total_reviews`
+is the hotel aggregate; `pageable_reviews` describes the current feed (nullable for
+Ctrip) and does not promise every aggregate review is retrievable.
 
 ## Errors and backoff
 
