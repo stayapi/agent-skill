@@ -221,9 +221,9 @@ Restaurant data. Search is coordinate-based — resolve place names with `meta_c
 | `agoda_hotel_reviews` | `GET /v1/agoda/hotel/reviews/{hotel_id}` | Agoda's own guest reviews only (partner-site reviews such as Booking.com excluded). Up to 20 per page; `sorting`: `7` recent (default), `6` highest, `5` lowest. |
 | `agoda_hotel_review_comments` | `GET /v1/agoda/hotel/reviews/{hotel_id}/comments` | Same Agoda-only reviews and shape via Agoda's ReviewComments API; kept for compatibility. |
 
-`pagination.total_count` is the Agoda-only total. English-language reviews come first, then other languages, each group in the requested order, so for a complete date range page until `has_more` is false.
+`pagination.total_count` is the Agoda-only total; a hotel with none returns `reviews: []` with zeros (REST 200, not `no_results`), while a page Agoda keeps blocking is `upstream_error` (REST 502). English-language reviews come first, then other languages, each group in the requested order, so for a complete date range page until `has_more` is false.
 
-Agoda review responses include nullable `owner_response` objects with nullable `text`, `published_date`, and `author` strings. Reply dates retain source formatting. `review_score` is Agoda's own guest score (`overall`, `score_text`, `review_count`), never a page average; `review_count` also counts rating-only stays, so it exceeds `total_count`. Missing scores can be `{}` or null, including review comments.
+Agoda review responses include nullable `owner_response` objects with nullable `text`, `published_date`, and `author` strings. Review `title`/`comment` are the reviewer's original text in nullable `language`; `translation` is null or Agoda's machine translation with nullable `language`, `title`, and `comment`. Reply dates retain source formatting. `review_score` is Agoda's own guest score (`overall`, `score_text`, `review_count`), never a page average; `review_count` also counts rating-only stays, so it exceeds `total_count`. Missing scores can be `{}` or null, including review comments.
 
 ## Trip.com
 
