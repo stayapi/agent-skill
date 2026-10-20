@@ -124,7 +124,7 @@ curl -sS "${AUTH[@]}" "$BASE/v1/google_hotels/search?location=Phuket\
 - `location` free-text; `check_in`/`check_out` required, must be future dates, checkout after checkin
 - `min_rating` 1.0–5.0 works; **there is no max-price filter upstream** — filter the response client-side for price caps
 
-For a deep-dive on one property (review histogram, photo gallery, rate band, similar hotels, nearby POIs), pivot to the `google_travel_*` tools — resolve an `entity_token` first with `google_travel_resolve(hotel_name)` or from a `google_travel_search` result. See [tools.md](tools.md#google-travel).
+For a deep-dive on one property (review histogram, photo gallery, rate band, similar hotels, nearby POIs), pivot to the `google_travel_*` tools: a result's `hotel_id` already is its `entity_token`, or resolve one with `google_travel_resolve(hotel_name)` / take it from a `google_travel_search` result. See [tools.md](tools.md#google-travel).
 
 ## 5. Google reviews for a place
 
@@ -138,7 +138,7 @@ curl -sS "${AUTH[@]}" --get "$BASE/v1/google_reviews/search-and-review" \
   --data-urlencode "query=Bellagio Las Vegas"
 
 # Have a data_id (from the call above or a Maps URL)? Paginate with it:
-curl -sS "${AUTH[@]}" "$BASE/v1/google_reviews/reviews?data_id=0x89c259af98ec7cbd:0x654b31dc1f9816db&sort_by=newest"
+curl -sS "${AUTH[@]}" "$BASE/v1/google_reviews/reviews?data_id=0x80c8c430cb5147bd:0x82f2c7c5d9d10d84&sort_by=newest"
 ```
 
 Pagination via `next_page_token` works only on the `data_id` path — so for multi-page pulls, always capture the `data_id` from the first response and continue with `/reviews`.
@@ -147,8 +147,9 @@ Details that matter for review requests:
 
 - `sort_by`: `most_relevant` (default), `newest`, `highest_rating`, `lowest_rating`. "Recent reviews" requires `sort_by=newest` — the default is relevance order, which will quietly return old reviews.
 - **Many Google reviews are rating-only** (`text: null`) — a page of 8 may hold only 2–3 with prose. When the user asks for N snippets, keep paginating until you have N with text.
+- **Check `iso_date_source` before trusting `iso_date`.** `review` = Google's exact time (first page only, for reviews Google Maps also lists); `photo` = the reviewer's photo upload time (hour, or day as `YYYY-MM-DD`; matched the review hour 60/61 in calibration); null = only the relative `date` ("3 weeks ago"). Deeper pages are mostly `photo`/null. For a date-range backfill, page `sort_by=newest` and stop on the relative label (or a `review`/`photo` date), or use the source platform's own reviews (Booking, TripAdvisor, …) when exact dates matter for every review.
 - **Edited reviews reorder by edit time**, while `iso_date` keeps the *original* post date — a review "edited 6 hours ago" can carry `iso_date: 2018-…`. A paginate-until-cutoff backfill on Google reviews must tolerate these outliers rather than stopping at the first old `iso_date`.
-- **Two Google review surfaces exist**: this one (`google_reviews_for_place`) is Google Maps place reviews and works for any place type — hotels, restaurants, attractions. `google_travel_reviews` is Google's hotel-only Travel surface (entity_token-keyed, supports topic filters). For a hotel either works: answer "Google reviews for X" with this one; use the travel one when you're already holding an `entity_token` or need topic/text filtering. See [tools.md](tools.md#google-travel).
+- **Two Google review surfaces exist**: this one (`google_reviews_for_place`) works for any place type — hotels, restaurants, attractions (paged from Google Travel when it knows the place, else Google Maps' first 5 reviews). `google_travel_reviews` is Google's hotel-only Travel surface (entity_token-keyed, supports topic filters). For a hotel either works: answer "Google reviews for X" with this one; use the travel one when you're already holding an `entity_token` or need topic/text filtering. See [tools.md](tools.md#google-travel).
 
 ## 6. Airbnb destination search, listing details, reviews & calendar
 

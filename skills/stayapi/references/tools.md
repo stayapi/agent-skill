@@ -59,13 +59,13 @@ REST also has per-listing `pricing`, `cancellation-policy`, `payment-methods`, a
 
 | MCP tool | REST | What it does |
 |---|---|---|
-| `google_hotels_search` | `GET /v1/google_hotels/search?location=&check_in=&check_out=` | Priced availability list. `min_rating` works; no upstream max-price filter — cap prices client-side. |
+| `google_hotels_search` | `GET /v1/google_hotels/search?location=&check_in=&check_out=` | Priced availability list (first ~20; nightly + total price, rating, stars, amenities, photos). Each `hotel_id` is a Google Travel `entity_token` — pass it straight to `google_travel_*`. `min_rating` works; no upstream max-price filter — cap prices client-side. |
 
 ## Google Reviews
 
 | MCP tool | REST | What it does |
 |---|---|---|
-| `google_reviews_for_place` | `GET /v1/google_reviews/reviews?data_id=` (by id) · `GET /v1/google_reviews/search-and-review?query=` (by name) | Google Maps reviews for any place type (hotels, restaurants, attractions). `sort_by`: `most_relevant` (default), `newest`, `highest_rating`, `lowest_rating`. `next_page_token` pagination works only on the `data_id` path — capture `data_id` from the first response. |
+| `google_reviews_for_place` | `GET /v1/google_reviews/reviews?data_id=` (by id) · `GET /v1/google_reviews/search-and-review?query=` (by name) | Google reviews for any place type (hotels, restaurants, attractions). Places Google Travel knows page from Google Travel (`search_metadata.provider: google_travel`, 10/page); others return their first 5 reviews from Google Maps (`google_maps`, `has_more: false`). A `query` is resolved with Google Maps search (`location` 'lat,lng' biases it). Per review `iso_date_source`: `review` = exact time (first page only, also brings `likes`/reviewer stats), `photo` = photo upload hour or day, null = only the relative `date`. `sort_by`: `most_relevant` (default), `newest`, `highest_rating`, `lowest_rating`. `next_page_token` pagination works only on the `data_id` path — capture `data_id` from the first response and pass the token back unchanged with the same `sort_by`. |
 
 This is the Maps place-review surface. For a hotel, `google_travel_reviews` (below) is an alternative with topic/text filters — use it when you already hold an `entity_token`; use this one to answer "Google reviews for X". Reviews can be rating-only (`text: null`), and edited reviews sort by edit time while `iso_date` keeps the original post date.
 
