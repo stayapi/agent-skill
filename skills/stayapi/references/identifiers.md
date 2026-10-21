@@ -12,7 +12,7 @@ next call. IDs are provider-specific; a search card is not a confirmed booking.
 | Expedia destination/name | REST `/v1/expedia/destinations/lookup`, then `/v1/expedia/hotel/lookup` | `region_id`, then numeric `property_id` for rates/reviews. |
 | Vrbo destination | REST `/v1/vrbo/destinations/lookup`, then dated `/v1/vrbo/search` | Internal review `property_id` and distinct public `listing_id`. |
 | Google Travel hotel name | `google_travel_resolve` or `google_travel_search` | Opaque `entity_token` for the other Google Travel tools. |
-| Google Maps place | `google_reviews_for_place(query=...)` | Returned `data_id` for review pagination. |
+| Google Maps place | `google_maps_search` or `google_reviews_for_place(query=...)` | Returned `data_id` for `google_maps_place` details and review pagination. |
 | Place coordinates | `meta_coordinates_lookup` | Latitude/longitude for OpenTable and Accor. |
 | TripAdvisor place/URL | `tripadvisor_geo_search` or pass URL | `geo_id` / `location_id`. |
 | Agoda hotel name | `agoda_hotel_lookup` | Select a candidate numeric `hotel_id`; suggestions are not dated availability. |

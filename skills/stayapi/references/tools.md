@@ -7,7 +7,7 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 - [Booking.com](#bookingcom)
 - [Airbnb](#airbnb)
 - [Expedia](#expedia) · [Vrbo](#vrbo)
-- [Google Hotels](#google-hotels) · [Google Reviews](#google-reviews) · [Google Travel](#google-travel)
+- [Google Hotels](#google-hotels) · [Google Reviews](#google-reviews) · [Google Travel](#google-travel) · [Google Maps](#google-maps)
 - [TripAdvisor](#tripadvisor)
 - [HolidayCheck](#holidaycheck)
 - [Accor (ALL)](#accor-all)
@@ -81,9 +81,21 @@ Deep per-hotel data from Google Travel. Everything keys off an `entity_token` �
 | `google_travel_info` | `GET /v1/google_travel/info` | Identity/metadata: address, coordinates, phone, check-in/out times, website, Maps ids. |
 | `google_travel_photos` | `GET /v1/google_travel/photos` | Photo gallery with dimensions. |
 | `google_travel_prices` | `GET /v1/google_travel/prices` | Nightly rate, usual-price band, partner booking offers. Optional paired `check_in`/`check_out` (YYYY-MM-DD, today/future, checkout later), `adults` 1–10 (default 2); omitted dates use Google defaults. |
+| `google_travel_rooms` | `GET /v1/google_travel/rooms` | Room-level offers per booking site for one stay: each partner's rooms (own names, photos, bed/view features) with per-rate nightly + whole-stay price, `free_cancellation` (+ ISO `free_cancellation_until` when unambiguous), `breakfast_included`; `official` = hotel's own site. Same params/dates as prices; a prices + rooms pair is one upstream fetch. Only partners with a Google sponsored listing have rooms (often 2–4). No offers → no_results. No links: to send the user to a site, use that partner's offer in `google_travel_prices`. |
 | `google_travel_similar` | `GET /v1/google_travel/similar` | Similar hotels + rentals nearby, each with its own token to pivot to. |
 | `google_travel_nearby` | `GET /v1/google_travel/nearby` | Nearby POIs (attractions, transit, airports, restaurants) with drive/walk times. |
 | `google_travel_reviews` | `GET /v1/google_reviews/travel/reviews` | Google-authored reviews: text `query` filter, `topic` (from summary's `topics[].category`), `sort`, token pagination. Keep filters identical across pages. |
+
+## Google Maps
+
+Places of any kind (restaurants, cafes, attractions, shops, hotels), keyed on the Google Maps `data_id` (`0x…:0x…`) — the same id `google_reviews_for_place` uses. A Google `place_id` (`ChIJ…`) is not accepted as input.
+
+| MCP tool | REST endpoint | Notes |
+|---|---|---|
+| `google_maps_search` | `GET /v1/google_maps/search?query=` | Free text ("pizza near Times Square", "Eiffel Tower") → up to 20 ranked places per page: `data_id`, `place_id`, name, categories, address, coordinates, rating, review count, phone, website, `hours_today`, `open_state`, thumbnail. Optional `location` 'lat,lng' centres the search; `page` 1–10 (`has_more`; past the end = empty page). Sponsored results excluded. |
+| `google_maps_place` | `GET /v1/google_maps/place?data_id=` | Details: ids (`place_id`, `kg_id`, `maps_url`), categories, summary/description, address + `address_components`, timezone, phone (local / international / E.164), website, rating + `rating_histogram`, `review_topics` (mention counts), 7-day `hours` (today first, with dates) + `other_hours` (delivery/takeout), `open_state`, `attributes`, `action_links` (order/reserve), `photos`, `owner_name`, `places_inside` (each with its own `data_id`), `hotel` (class, check-in/out, amenities; null for non-hotels). No reviews — chain the same `data_id` into `google_reviews_for_place`. |
+
+Use these for "what's near X / find places like Y / opening hours / phone / is it open"; for hotel prices and availability use Google Travel or Google Hotels.
 
 ## TripAdvisor
 
