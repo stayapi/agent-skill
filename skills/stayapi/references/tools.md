@@ -7,7 +7,7 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 - [Booking.com](#bookingcom)
 - [Airbnb](#airbnb)
 - [Expedia](#expedia) · [Vrbo](#vrbo)
-- [Google Hotels](#google-hotels) · [Google Reviews](#google-reviews) · [Google Travel](#google-travel) · [Google Maps](#google-maps)
+- [Google Reviews](#google-reviews) · [Google Travel](#google-travel) · [Google Maps](#google-maps)
 - [TripAdvisor](#tripadvisor)
 - [HolidayCheck](#holidaycheck)
 - [Accor (ALL)](#accor-all)
@@ -55,12 +55,6 @@ Airbnb `listing_id` values in REST and MCP responses are decimal strings, includ
 
 REST also has per-listing `pricing`, `cancellation-policy`, `payment-methods`, and `extract-id`.
 
-## Google Hotels
-
-| MCP tool | REST | What it does |
-|---|---|---|
-| `google_hotels_search` | `GET /v1/google_hotels/search?location=&check_in=&check_out=` | Priced availability list (first ~20; nightly + total price, rating, stars, amenities, photos). Each `hotel_id` is a Google Travel `entity_token` — pass it straight to `google_travel_*`. `min_rating` works; no upstream max-price filter — cap prices client-side. |
-
 ## Google Reviews
 
 | MCP tool | REST | What it does |
@@ -76,7 +70,7 @@ Deep per-hotel data from Google Travel. Everything keys off an `entity_token` �
 | MCP tool | REST | What it does |
 |---|---|---|
 | `google_travel_resolve` | `GET /v1/google_travel/resolve` | Hotel name → `entity_token` candidates. First step. |
-| `google_travel_search` | `GET /v1/google_travel/search` | Free-text search → ~20 hotel cards (rating, price, class, token each); dates, guest-rating threshold (3.5/4.0/4.5), currency, pagination. |
+| `google_travel_search` | `GET /v1/google_travel/search` | Free-text search → ~20 hotel cards (rating, price, class, token each); dates, guest-rating threshold (3.5/4.0/4.5), currency, pagination. No max-price filter — cap prices client-side. |
 | `google_travel_summary` | `GET /v1/google_travel/summary` | Overall rating, review count, star histogram, per-topic sub-scores. |
 | `google_travel_info` | `GET /v1/google_travel/info` | Identity/metadata: address, coordinates, phone, check-in/out times, website, Maps ids. |
 | `google_travel_photos` | `GET /v1/google_travel/photos` | Photo gallery with dimensions. |
@@ -92,10 +86,10 @@ Places of any kind (restaurants, cafes, attractions, shops, hotels), keyed on th
 
 | MCP tool | REST endpoint | Notes |
 |---|---|---|
-| `google_maps_search` | `GET /v1/google_maps/search?query=` | Free text ("pizza near Times Square", "Eiffel Tower") → up to 20 ranked places per page: `data_id`, `place_id`, name, categories, address, coordinates, rating, review count, phone, website, `hours_today`, `open_state`, thumbnail. Optional `location` 'lat,lng' centres the search; `page` 1–10 (`has_more`; past the end = empty page). Sponsored results excluded. |
+| `google_maps_search` | `GET /v1/google_maps/search?query=` | Free text ("pizza near Times Square", "Eiffel Tower") → up to 20 ranked places per page: `data_id`, `place_id`, name, categories, address, coordinates, rating, review count, phone, website, `hours_today`, `open_state`, thumbnail. Optional `location` 'lat,lng' centres the search; `page` 1–10 (`has_more`; past the end = empty page); pages can overlap slightly, so dedupe by `data_id` if you merge them. Sponsored results excluded. |
 | `google_maps_place` | `GET /v1/google_maps/place?data_id=` | Details: ids (`place_id`, `kg_id`, `maps_url`), categories, summary/description, address + `address_components`, timezone, phone (local / international / E.164), website, rating + `rating_histogram`, `review_topics` (mention counts), 7-day `hours` (today first, with dates) + `other_hours` (delivery/takeout), `open_state`, `attributes`, `action_links` (order/reserve), `photos`, `owner_name`, `places_inside` (each with its own `data_id`), `hotel` (class, check-in/out, amenities; null for non-hotels). No reviews — chain the same `data_id` into `google_reviews_for_place`. |
 
-Use these for "what's near X / find places like Y / opening hours / phone / is it open"; for hotel prices and availability use Google Travel or Google Hotels.
+Use these for "what's near X / find places like Y / opening hours / phone / is it open"; for hotel prices and availability use Google Travel.
 
 ## TripAdvisor
 

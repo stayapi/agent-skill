@@ -2,7 +2,7 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Expedia, Vrbo, Google Hotels, Google Travel, Google Reviews, Google Maps, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. Use whenever the user wants real hotel prices, availability, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data, or Google Maps place search and details (hours, phone, ratings) — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.51
+  version: 0.1.52
 ---
 
 # StayAPI — Live Hotel & Travel Data
@@ -74,7 +74,7 @@ The core flows below cover most requests; [references/workflows.md](references/w
 1. **Destination lookup → hotel search** (Booking): free-text city → `dest_id` → hotel list with prices and `hotel_id`s.
 2. **Hotel details & photos** (Booking): `hotel_id` → compact details / full signed photo gallery.
 3. **Guest reviews & date-range backfill** (Booking): paginated reviews; `sort=recent_desc` + paginate-until-cutoff for "all reviews since X".
-4. **Google Hotels search**: location + dates → priced availability list.
+4. **Google Travel hotel search**: free-text query ("hotels in Lisbon") + optional dates → priced hotel cards, each with an `entity_token` for the other `google_travel_*` tools.
 5. **Google reviews for a place**: name or `data_id` → Google reviews with pagination.
 6. **Airbnb destination search, details, reviews & calendar**: destination → first-page listing cards, then `listing_id` → details (dates required), reviews, or 1–12 months of daily availability.
 7. **HolidayCheck hotel data**: hotel name → UUID search result → details or one fixed ten-review page; `recent_desc` for newest-first review collection.

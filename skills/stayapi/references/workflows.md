@@ -15,7 +15,7 @@ Dates in examples are placeholders — always use dates in the future, and pass 
 1. [Destination lookup → hotel search (Booking)](#1-destination-lookup--hotel-search-booking)
 2. [Hotel details & photos (Booking)](#2-hotel-details--photos-booking)
 3. [Guest reviews & date-range backfill (Booking)](#3-guest-reviews--date-range-backfill-booking)
-4. [Google Hotels search](#4-google-hotels-search)
+4. [Google Travel hotel search](#4-google-travel-hotel-search)
 5. [Google reviews for a place](#5-google-reviews-for-a-place)
 6. [Airbnb destination search, listing details & reviews](#6-airbnb-destination-search-listing-details--reviews)
 7. [Hilton property → dated cash and full-points rewards](#7-hilton-property--dated-cash-and-full-points-rewards)
@@ -108,23 +108,25 @@ Parameters:
 
 **Date-range backfill pattern** ("all reviews from the last 12 months"): request `sort=recent_desc`, walk `page=1,2,3…` collecting reviews, and stop as soon as a page's oldest `reviewed_date` is older than the cutoff. Relevance order can't do this — only `recent_desc` is chronologically monotonic.
 
-## 4. Google Hotels search
+## 4. Google Travel hotel search
 
-Priced availability from Google Hotels — good default when the user wants a market-wide price scan rather than one platform.
+Priced availability from Google Travel (Google's hotel search) — good default when the user wants a market-wide price scan rather than one platform.
 
-**MCP**: `google_hotels_search(location="Phuket", check_in="2026-09-11", check_out="2026-09-13")`
+**MCP**: `google_travel_search(query="hotels in Phuket", check_in="2026-09-11", check_out="2026-09-13")`
 
 **REST**:
 
 ```bash
-curl -sS "${AUTH[@]}" "$BASE/v1/google_hotels/search?location=Phuket\
-&check_in=2026-09-11&check_out=2026-09-13&adults=2&currency=USD&min_rating=4.0"
+curl -sS "${AUTH[@]}" -G "$BASE/v1/google_travel/search" \
+  --data-urlencode "query=hotels in Phuket" \
+  -d check_in=2026-09-11 -d check_out=2026-09-13 -d adults=2 -d currency=USD -d min_rating=4.0
 ```
 
-- `location` free-text; `check_in`/`check_out` required, must be future dates, checkout after checkin
-- `min_rating` 1.0–5.0 works; **there is no max-price filter upstream** — filter the response client-side for price caps
+- `query` is free text ("hotels in Phuket", "maldives hotels"); `check_in`/`check_out` are an optional pair (future dates, checkout after checkin) — without them Google picks default dates
+- `min_rating` accepts only `3.5`, `4.0` or `4.5` (Google's own guest-rating filter); **there is no max-price filter** — filter the response client-side for price caps
+- ~20 cards per page; `page` paginates (`has_more`). Pages can overlap slightly, so dedupe by `entity_token` if you merge them
 
-For a deep-dive on one property (review histogram, photo gallery, rate band, similar hotels, nearby POIs), pivot to the `google_travel_*` tools: a result's `hotel_id` already is its `entity_token`, or resolve one with `google_travel_resolve(hotel_name)` / take it from a `google_travel_search` result. See [tools.md](tools.md#google-travel).
+For a deep-dive on one property (review histogram, photo gallery, rate band, room offers, similar hotels, nearby POIs), pass a card's `entity_token` to the other `google_travel_*` tools, or resolve one by name with `google_travel_resolve`. See [tools.md](tools.md#google-travel).
 
 ## 5. Google reviews for a place
 
