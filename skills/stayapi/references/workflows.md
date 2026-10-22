@@ -82,9 +82,15 @@ curl -sS "${AUTH[@]}" "$BASE/v2/booking/hotel/details?hotel_id=1331780"
 # Full photo gallery — signed, ready-to-use URLs at three sizes:
 curl -sS "${AUTH[@]}" "$BASE/v2/booking/hotel/photos?hotel_id=1331780"
 
-# Room types + bookable rate blocks for a stay window:
+# Room types without dates:
+curl -sS "${AUTH[@]}" "$BASE/v1/booking/hotel/room-types?hotel_id=1331780"
+# Room availability & rates for selected dates:
 curl -sS "${AUTH[@]}" "$BASE/v1/booking/hotel/rooms?hotel_id=1331780&checkin=2026-09-11&checkout=2026-09-13"
 ```
+
+For MCP, call `booking_hotel_room_types(hotel_id="1331780")` for the catalog and
+`booking_hotel_rooms` for dated rates. Do not invent stay dates for a catalog-only
+request, or interpret the returned catalog count as rooms available.
 
 Booking photo URLs are signed per photo — return them as-is; never reconstruct an image URL from a photo id.
 
