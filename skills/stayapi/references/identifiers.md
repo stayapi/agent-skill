@@ -7,7 +7,7 @@ next call. IDs are provider-specific; a search card is not a confirmed booking.
 |---|---|---|
 | Booking city/area | `booking_lookup_destination` with the bare city name | Signed `dest_id` for `booking_search_hotels`; adding a region can bias results toward HOTEL matches. |
 | Booking hotel URL | `GET /v1/booking/hotel/url-to-id`, or pass URL to supported detail/review/room tools | Numeric `hotel_id`; browser-backed, 5–40 seconds. |
-| Airbnb destination | `airbnb_search_listings(location=...)` | First-page listing cards only; no property-name lookup. |
+| Airbnb destination | `airbnb_search_listings(location=...)` | Listing cards, `page` 1–15 (18 each); `location` may be a postal code; no property-name lookup. |
 | Airbnb URL | Pass URL directly | `listing_id`; local parse. |
 | Expedia destination/name | REST `/v1/expedia/destinations/lookup`, then `/v1/expedia/hotel/lookup` | `region_id`, then numeric `property_id` for rates/reviews. |
 | Vrbo destination | REST `/v1/vrbo/destinations/lookup`, then dated `/v1/vrbo/search` | Internal review `property_id` and distinct public `listing_id`. |

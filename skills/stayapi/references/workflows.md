@@ -161,19 +161,19 @@ Details that matter for review requests:
 
 ## 6. Airbnb destination search, listing details, reviews & calendar
 
-Use destination search when the user needs listings; it is not a property-name lookup and returns the first page only. Airbnb URL→ID is an instant regex — passing a URL costs nothing extra.
+Use destination search when the user needs listings; it is not a property-name lookup. `location` is a city, neighborhood, or postal code (`30308`, `SW1A 1AA`). Each call returns one `page` (1–15, 18 listings) — Airbnb caps a search at ~270 listings. Airbnb URL→ID is an instant regex — passing a URL costs nothing extra.
 
-**MCP**: `airbnb_search_listings(location="Paris, France", check_in="2026-10-15", check_out="2026-10-18", adults=2)`
+**MCP**: `airbnb_search_listings(location="Paris, France", check_in="2026-10-15", check_out="2026-10-18", adults=2, page=1)`
 
 **REST**:
 
 ```bash
 curl -sS "${AUTH[@]}" --get "$BASE/v1/airbnb/search" \
   --data-urlencode "location=Paris, France" \
-  -d check_in=2026-10-15 -d check_out=2026-10-18 -d adults=2 -d currency=USD
+  -d check_in=2026-10-15 -d check_out=2026-10-18 -d adults=2 -d currency=USD -d page=1
 ```
 
-`page_scope` is always `first_page`, `availability_verified` is always false, and no cursor is returned. A dated result exposes `displayed_price` only when `price_applies_to_requested_dates=true`; an undated result omits all prices.
+Keep requesting `page+1` while `has_next_page` is true (`total_pages` ≤ 15; a page past the last is an empty 200). Every page is a separate billed call, so stop once you have enough. To collect more listings than one search allows (e.g. thousands for a city), tile it with postal codes and page each one; results are centered on the location rather than bounded by it and can overlap, so dedupe by `listing_id`. `availability_verified` is always false; `page_scope` is deprecated (use `page`). A dated result exposes `displayed_price` only when `price_applies_to_requested_dates=true`; an undated result omits all prices.
 
 **MCP**: `airbnb_listing_details(url="https://www.airbnb.com/rooms/22120898", check_in=..., check_out=...)` · `airbnb_listing_reviews(listing_id=22120898, sort_by="MOST_RECENT")` · `airbnb_listing_calendar(listing_id=22120898, months=3)`
 

@@ -49,7 +49,7 @@ Airbnb `listing_id` values in REST and MCP responses are decimal strings, includ
 
 | MCP tool | REST | What it does |
 |---|---|---|
-| `airbnb_search_listings` | `GET /v1/airbnb/search?location=` | First-page destination listings. Optional paired dates; undated results omit prices and neither mode verifies availability. No property-name lookup or pagination. |
+| `airbnb_search_listings` | `GET /v1/airbnb/search?location=` | Destination listings; `location` is a city, neighborhood or postal code. `page` 1–15 (18 per page) with `total_pages`/`has_next_page`; dedupe overlapping pages/areas by `listing_id`. Optional paired dates; undated results omit prices and neither mode verifies availability. No property-name lookup. |
 | `airbnb_listing_details` | `GET /v1/airbnb/listing/{id}/details` or `/v1/airbnb/listing/details-from-url?url=` | Listing details. `check_in`/`check_out` required. URL parsing is instant. |
 | `airbnb_listing_reviews` | `GET /v1/airbnb/listing/reviews/{id}` or `/v1/airbnb/listing/reviews-from-url?url=` | Reviews, up to 50/page, `sort_by=BEST_QUALITY\|MOST_RECENT`. |
 | `airbnb_listing_calendar` | `GET /v1/airbnb/listing/{id}/calendar` or `/v1/airbnb/listing/calendar-from-url?url=` | Daily availability from this month; `months=1..12` (default 12). No price quote. |
