@@ -10,7 +10,7 @@ next call. IDs are provider-specific; a search card is not a confirmed booking.
 | Airbnb destination | `airbnb_search_listings(location=...)` | Listing cards, `page` 1–15 (18 each); `location` may be a postal code; no property-name lookup. |
 | Airbnb URL | Pass URL directly | `listing_id`; local parse. |
 | Expedia destination/name | REST `/v1/expedia/destinations/lookup`, then `/v1/expedia/hotel/lookup` | `region_id`, then numeric `property_id` for rates/reviews. |
-| Vrbo destination | REST `/v1/vrbo/destinations/lookup`, then dated `/v1/vrbo/search` | Internal review `property_id` and distinct public `listing_id`. |
+| Vrbo destination | REST `/v1/vrbo/destinations/lookup`, then dated `/v1/vrbo/search` | Internal `property_id` for reviews and `expedia_hotel_rates` pricing; distinct public `listing_id` for URLs only. |
 | Google Travel hotel name | `google_travel_resolve` or `google_travel_search` | Opaque `entity_token` for the other Google Travel tools. |
 | Google Maps place | `google_maps_search` or `google_reviews_for_place(query=...)` | Returned `data_id` for `google_maps_place` details and review pagination. |
 | Place coordinates | `meta_coordinates_lookup` | Latitude/longitude for OpenTable and Accor. |
