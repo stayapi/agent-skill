@@ -2,7 +2,7 @@
 
 - Use three-letter uppercase currency codes. Invalid currency fails before the provider call.
 - Booking city `dest_id` values are signed. Preserve the minus sign. Hotel URLs must be
-  `https://www.booking.com/hotel/{cc}/{slug}.html`; URL resolution is browser-backed.
+  `https://www.booking.com/hotel/{cc}/{slug}.html`; URL resolution is slow (5–40 seconds).
 - Booking search prices are whole-stay totals under `data.hotels`, not nightly amounts.
   Results retain Booking's ranking; over-fetch and sort client-side only when needed.
 - Booking families require `children` plus exactly that many comma-separated
