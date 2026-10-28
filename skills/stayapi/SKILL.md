@@ -1,8 +1,8 @@
 ---
 name: stayapi
-description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Expedia, Vrbo, Google Hotels, Google Travel, Google Reviews, Google Maps, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. Use whenever the user wants real hotel prices, availability, room-type catalogs, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data, or Google Maps place search and details (hours, phone, ratings) — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
+description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Expedia, Vrbo, Google Hotels, Google Travel, Google Reviews, Google Maps, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, Kayak, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. Use whenever the user wants real hotel prices, availability, room-type catalogs, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data, or Google Maps place search and details (hours, phone, ratings) — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.59
+  version: 0.1.60
 ---
 
 # StayAPI — Live Hotel & Travel Data
@@ -83,12 +83,13 @@ The core flows below cover most requests; [references/workflows.md](references/w
 5. **Google reviews for a place**: name or `data_id` → Google reviews with pagination.
 6. **Airbnb destination search, details, reviews & calendar**: destination (city or postal code) → listing cards, 18 per page (pages 1–15), then `listing_id` → details (dates required), reviews, or 1–12 months of daily availability.
 7. **HolidayCheck hotel data**: hotel name → UUID search result → details or one fixed ten-review page; `recent_desc` for newest-first review collection.
+8. **Kayak city calendar or property content**: city name → `kayak_lookup_destination` → `city_id` → `kayak_buzz_calendar` for relative bands. For a property URL, use `kayak_hotel_url_to_id` once, call details/photos/amenities with the canonical URL, and paginate reviews with the extracted hotel ID. Kayak does not provide live room rates through this surface.
 
 For dated Agoda city discovery, use `agoda_search_hotels` with a numeric city ID and stay dates. For an Agoda hotel name, use `agoda_hotel_lookup` and select a candidate ID before details, prices or reviews. Use `agoda_hotel_details` for date-free source address, description, amenities, photos and useful_information (declared room count, opening year and check-in/out); missing values stay null and year_opened is not construction year. Respect its explicit obfuscated-address flag. Use `agoda_hotel_url_to_id` when you have a hotel URL.
 
 For rooms, cancellation terms or breakfast at a hotel across booking sites, `google_travel_rooms` (same `entity_token` and stay parameters as `google_travel_prices`) returns each site's rooms and rates; only sites with a Google sponsored listing have room detail.
 
-Everything beyond these — TripAdvisor, Google Travel deep-dives, Google Maps place search and details, Accor, Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), OpenTable, Agoda, Trip.com, room-level rates, price calendars, private dining — is cataloged in [references/tools.md](references/tools.md). Prefer the connected server's discovered schema for MCP calls; use the catalog for REST equivalents and provider-specific constraints.
+Everything beyond these — TripAdvisor, Google Travel deep-dives, Google Maps place search and details, Accor, Radisson, Marriott Bonvoy, Hilton, Kayak, WeHotel (Jin Jiang), OpenTable, Agoda, Trip.com, room-level rates, price calendars, private dining — is cataloged in [references/tools.md](references/tools.md). Prefer the connected server's discovered schema for MCP calls; use the catalog for REST equivalents and provider-specific constraints.
 
 Trip.com/Ctrip review rows may be syndicated. Preserve each review's `source`
 (`tripcom`, `ctrip`, `expedia`, `hotelscom`, `tripadvisor`, or `unknown`); aggregate Expedia
