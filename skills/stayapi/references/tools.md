@@ -14,6 +14,7 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 - [Radisson](#radisson)
 - [Marriott Bonvoy](#marriott-bonvoy)
 - [Hilton](#hilton)
+- [Kayak](#kayak)
 - [WeHotel (Jin Jiang)](#wehotel-jin-jiang)
 - [MakeMyTrip India](#makemytrip-india)
 - [Otelpuan](#otelpuan)
@@ -156,6 +157,20 @@ Brand.com search, live room rates and a per-date price calendar, with Bonvoy awa
 | `marriott_bonvoy_search` | `GET /v1/marriott/bonvoy/search` | Properties near `latitude`/`longitude` for a stay: `property_id`, brand, rating, distance, lowest cash price, `points_per_night`. 20/page via `offset`; `sort_by` `DISTANCE` or `PRICE`; optional `corporate_code`. Without `corporate_only` a hotel lacking a code rate shows its regular price; `corporate_only=true` (requires `corporate_code`) keeps only hotels with a rate under the code, priced at it. |
 | `marriott_bonvoy_rooms` | `GET /v1/marriott/bonvoy/rooms` | Room types and rate plans for one `property_id` and stay, cash and award. **`points` and `per_night` are the check-in night only** — use `points_total` (whole stay, matches marriott.com) or `total` (cash incl. taxes/fees), or sum `nightly_rates` (one `{date, cash, points, free_night}` per night). A room can list several award plans at different prices; key on `rate_plan_code`. Each rate has `source_of_rate` (`MARSHA` or `ACRS`, Marriott's newer reservation system with its own longer plan/room codes): ACRS rates have empty `nightly_rates` and null `per_night`/`points` on multi-night stays, so use `total`/`points_total`. Unknown property → 404 `PROPERTY_NOT_FOUND` (MCP `no_results`). `UPSTREAM_PROPERTY_REJECTED` (MCP `upstream_error`) means Marriott rejected the code and the second lookup could not complete; retry later. |
 | `marriott_bonvoy_price_calendar` | `GET /v1/marriott/bonvoy/price-calendar` | Lowest rate per check-in date for one `property_id`, `date_from`..`date_to` inclusive (≤ 35 days apart, so ≤ 36 dates), each priced for `nights` (1–9). Every date is listed; `available: false` means no rate (prices null). `per_night` = average nightly, `stay_total` = stay, both before taxes/fees, in the property's own currency (no conversion). `corporate_code` returns ONLY rates under the code (unknown code → all dates unavailable). `use_points=true` → `points_total` for the whole stay, cash null; not combinable with `corporate_code`. Unknown property → 404. |
+
+## Kayak
+
+| MCP tool | REST endpoint | Notes |
+|---|---|---|
+| `kayak_lookup_destination` | `GET /v1/kayak/destinations/lookup` | City-only suggestions; retain string `city_id`. |
+| `kayak_hotel_reviews` | `GET /v1/kayak/hotel/reviews` | Positive int32 hotel ID; page 1–1000; fixed size 10; source attribution and 0–100 scores. |
+| `kayak_buzz_calendar` | `GET /v1/kayak/buzz-calendar` | City ID → LOW/MEDIUM/HIGH relative bands; no numeric rates, currency, or availability guarantee. |
+| `kayak_hotel_url_to_id` | `GET /v1/kayak/hotel/url-to-id` | Canonical HTTPS Kayak URL; local parsing does not verify existence. |
+| `kayak_hotel_details` | `GET /v1/kayak/hotel/details` | Undated property metadata by canonical URL. |
+| `kayak_hotel_photos` | `GET /v1/kayak/hotel/photos` | Property photos and attribution by canonical URL. |
+| `kayak_hotel_amenities` | `GET /v1/kayak/hotel/amenities` | Highlighted and categorized amenities by canonical URL. |
+
+Resolve ambiguous cities using country/region. Each successful call costs one quota unit.
 
 ## Hilton
 

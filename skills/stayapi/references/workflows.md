@@ -22,6 +22,7 @@ Dates in examples are placeholders — always use dates in the future, and pass 
 8. [Otelpuan hotel → dated room offers or reviews](#8-otelpuan-hotel--dated-room-offers-or-reviews)
 9. [HolidayCheck name → details or reviews](#9-holidaycheck-name--details-or-reviews)
 10. [Marriott flexible dates → cheapest check-in dates](#10-marriott-flexible-dates--cheapest-check-in-dates)
+11. [Kayak city → relative hotel-price calendar](#11-kayak-city--relative-hotel-price-calendar)
 
 ---
 
@@ -313,6 +314,14 @@ after `date_from`); split longer windows. Rank only `available: true` dates by
 `corporate_code`, every available date is priced under that code; an all-false
 calendar means the property has no rate under it for that window, not an error.
 Each call costs one credit, so budget one per property per window.
+
+## 11. Kayak city → relative hotel-price calendar
+
+1. Call `kayak_lookup_destination(query="Paris", limit=10)` and choose the intended city using country/region. Preserve its `city_id` string.
+2. Call `kayak_buzz_calendar(city_id="36014")` with the chosen ID.
+3. Present LOW/MEDIUM/HIGH as relative comparisons. Do not invent amounts, currency, or availability.
+
+For property content, pass a canonical URL to details, photos, or amenities. Resolve once for reviews, then advance pages while `has_more` is true. Preserve review source and the 0–100 score scale. This flow does not fetch live room rates.
 
 ## Native Expedia / Vrbo destination discovery
 
