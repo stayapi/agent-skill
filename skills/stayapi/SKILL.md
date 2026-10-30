@@ -2,15 +2,15 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Expedia, Vrbo, Google Hotels, Google Travel, Google Reviews, Google Maps, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, Kayak, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. Use whenever the user wants real hotel prices, availability, room-type catalogs, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data, or Google Maps place search and details (hours, phone, ratings) — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.62
+  version: 0.1.63
 ---
 
 # StayAPI — Live Hotel & Travel Data
 
 For Booking room names, beds, photos or facilities without a stay, use
 `booking_hotel_room_types` (`GET /v1/booking/hotel/room-types`), with optional `language` (default `en-us`,
-`it` for Italian). Preserve nullable bed text; `name_with_count` is localized
-when supplied. Use
+`it` for Italian). Beds contain only `bed_type`, `count`, and nullable `name_with_count`;
+preserve its localized text when supplied. Use
 `booking_hotel_rooms` for dated Room availability & rates. Catalog entry counts
 do not indicate inventory; no guest-capacity guarantee is supplied. Dated rooms omit
 facilities; compare exact occupancy, tax basis and rate conditions, and treat
