@@ -227,7 +227,8 @@ retrieve quotes. Never infer mixed-payment costs or fifth-night benefits.
 Check `availability_status` before interpreting offers. `unavailable` is a
 successful completed query with `room_types: []`, `total: 0`, and an explanatory
 `availability_message`; `native_currency` may be null. Report no availability
-for that stay without claiming the cause is sold out. Offer other dates or
+for that stay using the supplied message (no rooms or no rates), without claiming
+the cause is sold out. Offer other dates or
 properties if useful; do not retry the same query as a provider error. Unknown
 or malformed availability still fails and follows the normal error policy.
 
