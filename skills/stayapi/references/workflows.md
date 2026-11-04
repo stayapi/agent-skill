@@ -222,13 +222,16 @@ cash starting-offer scope. `reward_rates` has explicit `points_total` and dated
 `nightly_rates`; `points` is only the check-in night. Either offer list may be
 empty, but every returned room has a verified offer. `members_only` and
 `login_required` describe booking restrictions; no Hilton login is needed to
-retrieve quotes. Never infer mixed-payment costs or fifth-night benefits.
+retrieve quotes. A missing starting cash offer can use a unique non-confidential
+offer requiring neither sign-in nor Honors membership; other booking conditions
+may apply. Rooms without a qualifying cash offer or rewards can be omitted.
+Never infer mixed-payment costs or fifth-night benefits.
 
 Check `availability_status` before interpreting offers. `unavailable` is a
 successful completed query with `room_types: []`, `total: 0`, and an explanatory
 `availability_message`; `native_currency` may be null. Report no availability
-for that stay using the supplied message (no rooms or no rates), without claiming
-the cause is sold out. Offer other dates or
+for that stay using the supplied message (no rooms, no rates, or not bookable), without claiming
+the cause is sold out or closed. Offer other dates or
 properties if useful; do not retry the same query as a provider error. Unknown
 or malformed availability still fails and follows the normal error policy.
 
