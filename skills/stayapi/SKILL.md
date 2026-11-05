@@ -2,7 +2,7 @@
 name: stayapi
 description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Expedia, Vrbo, Google Hotels, Google Travel, Google Reviews, Google Maps, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, Kayak, WeHotel (Jin Jiang), MakeMyTrip India, Otelpuan, and OpenTable. Use whenever the user wants real hotel prices, availability, room-type catalogs, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data, or Google Maps place search and details (hours, phone, ratings) — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.67
+  version: 0.1.68
 ---
 
 # StayAPI — Live Hotel & Travel Data
@@ -110,10 +110,10 @@ Ctrip) and does not promise every aggregate review is retrievable.
 
 ## Errors and backoff
 
-REST errors are RFC 7807 `application/problem+json`; MCP tools return structured error dicts (`invalid_input`, `url_resolution_failed`, `upstream_error`, `no_results`, `rate_limited`, `quota_exhausted`, `feature_unavailable`). Two rules matter:
+REST errors are RFC 7807 `application/problem+json`; MCP tools return structured error dicts (`invalid_input`, `url_resolution_failed`, `upstream_error`, `no_results`, `rate_limited`). Two rules matter:
 
 - **Check the tool outcome.** REST uses HTTP status; MCP may carry `isError`, JSON-RPC errors, or a structured helper error inside HTTP 200. Never parse an error as data. MCP invalid-input/provider/protocol failures release the reserved credit; definitive `no_results` remains billable.
-- **Respect `retry_after`.** `rate_limited` means back off briefly and retry once or twice. `quota_exhausted` includes `retry_after` and `reset_at` — the monthly quota is gone, so stop calling and tell the user when it resets (or suggest upgrading); retrying in a loop only burns time.
+- **Respect `retry_after`.** `rate_limited` means back off briefly and retry once or twice. An exhausted quota is rejected before any tool runs: HTTP 402 (free plan or overdue subscription) or 429 with `quota_exceeded` and `reset_at` (paid plan) — on MCP a JSON-RPC error `-32001`, not a tool result. Stop calling and tell the user when it resets (or suggest upgrading); retrying in a loop only burns time.
 
 Transient upstream errors (`upstream_error`, HTTP 502/503) are usually worth one retry after a few seconds — this is live data from third-party sites, not a static database.
 

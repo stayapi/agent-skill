@@ -1,8 +1,13 @@
 # StayAPI provider constraints
 
 - Use three-letter uppercase currency codes. Invalid currency fails before the provider call.
+- Stay and reservation dates are `YYYY-MM-DD`. A date counts as past only once it is past
+  everywhere, so "today" in the caller's local time is accepted.
 - Booking city `dest_id` values are signed. Preserve the minus sign. Hotel URLs must be
   `https://www.booking.com/hotel/{cc}/{slug}.html`; URL resolution is slow (5–40 seconds).
+- Booking stay dates (search, rooms): `checkin` alone is one night; `checkout` alone, a past
+  `checkin`, checkout not after checkin, or more than 90 nights is rejected. With neither,
+  rooms uses one night 14 days out and REST search is undated; MCP search requires both.
 - Booking search prices are whole-stay totals under `data.hotels`, not nightly amounts.
   Results retain Booking's ranking; over-fetch and sort client-side only when needed.
 - Booking families require `children` plus exactly that many comma-separated
@@ -14,7 +19,7 @@
 - Airbnb details require paired dates. Airbnb search is destination discovery, one page
   (1–15, 18 listings) per call, at most ~270 listings per location (tile with postal codes),
   with optional date-qualified displayed prices only; it never confirms availability.
-- Expedia rates require a numeric `property_id`, ordered nonpast dates, and optional
+- Expedia rates require a `property_id` of ASCII digits without a leading zero, ordered nonpast dates, and optional
   `children_ages` as a JSON integer array of at most six ages 0–17. Expedia/Vrbo
   discovery is REST-only; discovery cards omit prices and do not confirm availability.
 - Sort names differ: Booking/HolidayCheck `recent_desc`, Airbnb `MOST_RECENT`, Google

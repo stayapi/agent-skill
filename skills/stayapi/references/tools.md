@@ -31,18 +31,18 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 
 | MCP tool | REST | What it does |
 |---|---|---|
-| `booking_lookup_destination` | `GET /v1/booking/destinations/lookup?query=` | Free-form name → signed `dest_id`. First step before search. Query bare city names. |
-| `booking_search_hotels` | `GET /v1/booking/search?dest_id=` | Hotel list for a destination + stay window. `dest_id` is signed — keep the minus. `total_results` is Booking's real count; only offsets 0–1000 are served — page via `has_next_page`. Prices depend on `country_market` (default `US`) — keep it the same across search/rooms/prices. |
+| `booking_lookup_destination` | `GET /v1/booking/destinations/lookup?query=` | Free-form name → signed `dest_id`. First step before search. Query bare city names. REST: blank `query` 400, no match 404 (MCP `no_results`). |
+| `booking_search_hotels` | `GET /v1/booking/search?dest_id=` | Hotel list for a destination + stay window. `dest_id` is signed — keep the minus. MCP requires `checkin` and `checkout`; REST without dates is an undated search. `total_results` is Booking's real count; only offsets 0–1000 are served — page via `has_next_page`. Prices depend on `country_market` (default `US`) — keep it the same across search/rooms/prices. |
 | `booking_hotel_details` | `GET /v2/booking/hotel/details?hotel_id=` | Compact one-hotel details. REST `data.description` (MCP top-level `description`) is the property description or `null` when unavailable. REST `data.check_in_time` / `data.check_out_time` (MCP top-level) are earliest check-in / latest check-out as `"HH:MM"`, or `null` when unavailable. REST `data.property_type` (MCP top-level `property_type`) is Booking's classification, e.g. `HOTEL`, `APARTMENT`, `HOLIDAY_HOME`, `CHALET`, or `null` when unavailable; accept future strings. v2 takes `hotel_id` only; resolve URLs first. |
-| `booking_hotel_room_types` | `GET /v1/booking/hotel/room-types?hotel_id=` | Dateless room-type catalog: names, descriptions, beds, signed photos, facilities. MCP also accepts canonical `url`. Full `success/data/retrieved_at` envelope; unknowns null. `metadata.total_room_types` counts returned entries, not inventory; no rates or guest-capacity guarantees. Optional `language` defaults to `en-us` (`it` for Italian); translations may be unavailable. Every bed contains only `bed_type`, `count`, and `name_with_count`; `name_with_count` supplies localized text when available and is explicitly null otherwise. |
-| `booking_hotel_rooms` | `GET /v1/booking/hotel/rooms?hotel_id=` | Room availability & rates for a stay, incl. `availability_summary.total_available_rooms`. Use the search's `country_market` so prices match. Recovered offers carry `inventory_scope="recommended"`; counts cover only those offers. `rooms[].facilities` is omitted; use the room-type catalog for amenities. `inventory_scope="desktop_listed"` means listed offers, not guaranteed completeness. `price.requires_sign_in` remains null without explicit evidence; Genius labels alone do not prove eligibility. Display totals may exclude charges: inspect `tax_basis`, `charges_included` and `charges_excluded`. Family/multi-room fit can be unknown. Each rate includes `cancellation_policy_title`, a localized plain-text cancellation-policy summary or null when unavailable, and `cancellation_deadline_date`, the property-local calendar date of the free-cancellation deadline (`YYYY-MM-DD`) or null when unavailable or not applicable. The date does not specify an exact cutoff time or time zone, or guarantee free cancellation throughout that day; refer to the rate policy for conditions. `refundable_until` remains an exact timestamp or null, and `cancellation_policy` is unchanged. |
-| `booking_hotel_reviews` | `GET /v1/booking/hotel/reviews?hotel_id=` | Paginated reviews (max 25/page). `sort=recent_desc` for chronological backfill. |
+| `booking_hotel_room_types` | `GET /v1/booking/hotel/room-types?hotel_id=` | Dateless room-type catalog: names, descriptions, beds, signed photos, facilities. MCP also accepts canonical `url`. Full `success/data/retrieved_at` envelope; unknowns null. `metadata.total_room_types` counts returned entries, not inventory; no rates or guest-capacity guarantees. Optional `language` defaults to `en-us` (`it` for Italian); two letters with an optional two-letter region, else rejected; translations may be unavailable. Every bed contains only `bed_type`, `count`, and `name_with_count`; `name_with_count` supplies localized text when available and is explicitly null otherwise. |
+| `booking_hotel_rooms` | `GET /v1/booking/hotel/rooms?hotel_id=` | Room availability & rates for a stay, incl. `availability_summary.total_available_rooms`. Use the search's `country_market` so prices match. Recovered offers carry `inventory_scope="recommended"`; counts cover only those offers. `rooms[].facilities` is omitted; use the room-type catalog for amenities. `inventory_scope="desktop_listed"` means listed offers, not guaranteed completeness. `price.requires_sign_in` remains null without explicit evidence; Genius labels alone do not prove eligibility. Display totals may exclude charges: inspect `tax_basis`, `charges_included` and `charges_excluded`. Family/multi-room fit can be unknown. Each rate includes `cancellation_policy_title`, a localized plain-text cancellation-policy summary or null when unavailable, and `cancellation_deadline_date`, the property-local calendar date of the free-cancellation deadline (`YYYY-MM-DD`) or null when unavailable or not applicable. The date does not specify an exact cutoff time or time zone, or guarantee free cancellation throughout that day; refer to the rate policy for conditions. `refundable_until` remains an exact timestamp or null, and `cancellation_policy` is unchanged. An unknown `hotel_id` is `no_results` (REST 404). |
+| `booking_hotel_reviews` | `GET /v1/booking/hotel/reviews?hotel_id=` | Paginated reviews: `page` ≥ 1, `per_page` 1–25; an empty page has `has_next_page: false`. `sort=recent_desc` for chronological backfill. Unknown hotel → `no_results` (REST 404). |
 | `booking_hotel_photos` | `GET /v2/booking/hotel/photos?hotel_id=` | Full gallery; signed URLs at three sizes. MCP: `limit` (default 20, `0` = all) + `size` to trim; `metadata.photo_count` = full total. Never rebuild photo URLs from ids. |
 | — | `GET /v1/booking/hotel/url-to-id?url=` | Canonical hotel URL → numeric `hotel_id`. Slow: 5–40 s; cache the result. |
 
 REST additionally exposes `hotel/reviews/summary`, `hotel/reviews/scores`, `hotel/facilities`, `hotel/prices`, and `search_by_url` — see https://stayapi.com/docs. The three REST review endpoints return empty success data for valid zero-review hotels and `NOT_FOUND` for nonexistent IDs.
 
-Canonical URL shape (anything else is a 400): `https://www.booking.com/hotel/{cc}/{slug}.html`
+Every Booking `url` input must be a Booking.com hotel page, `https://www.booking.com/hotel/{cc}/{slug}.html`. Query strings, fragments, language suffixes (`.en-gb.html`) and a missing `https://` are normalized; anything else is `invalid_input` on `url` (REST 400).
 
 ## Airbnb
 
@@ -51,8 +51,8 @@ Airbnb `listing_id` values in REST and MCP responses are decimal strings, includ
 | MCP tool | REST | What it does |
 |---|---|---|
 | `airbnb_search_listings` | `GET /v1/airbnb/search?location=` | Destination listings; `location` is a city, neighborhood or postal code. `page` 1–15 (18 per page) with `total_pages`/`has_next_page`; dedupe overlapping pages/areas by `listing_id`. Optional paired dates; undated results omit prices and neither mode verifies availability. No property-name lookup. |
-| `airbnb_listing_details` | `GET /v1/airbnb/listing/{id}/details` or `/v1/airbnb/listing/details-from-url?url=` | Listing details. `check_in`/`check_out` required. URL parsing is instant. |
-| `airbnb_listing_reviews` | `GET /v1/airbnb/listing/reviews/{id}` or `/v1/airbnb/listing/reviews-from-url?url=` | Reviews, up to 50/page, `sort_by=BEST_QUALITY\|MOST_RECENT`. |
+| `airbnb_listing_details` | `GET /v1/airbnb/listing/{id}/details` or `/v1/airbnb/listing/details-from-url?url=` | Listing details. `check_in`/`check_out` required, ordered, check-in not in the past; `adults` 1–16, `children` 0–10, `infants` 0–5, `pets` 0–5. A listing that no longer exists → `no_results` (REST 404). URL parsing is instant. |
+| `airbnb_listing_reviews` | `GET /v1/airbnb/listing/reviews/{id}` or `/v1/airbnb/listing/reviews-from-url?url=` | Reviews, `limit` 1–50, `sort_by=BEST_QUALITY\|MOST_RECENT`. REST `total_count` can be null (total unknown). |
 | `airbnb_listing_calendar` | `GET /v1/airbnb/listing/{id}/calendar` or `/v1/airbnb/listing/calendar-from-url?url=` | Daily availability from this month; `months=1..12` (default 12). No price quote. |
 
 REST also has per-listing `pricing`, `cancellation-policy`, `payment-methods`, and `extract-id`.
@@ -62,6 +62,8 @@ REST also has per-listing `pricing`, `cancellation-policy`, `payment-methods`, a
 | MCP tool | REST | What it does |
 |---|---|---|
 | `google_reviews_for_place` | `GET /v1/google_reviews/reviews?data_id=` (by id) · `GET /v1/google_reviews/search-and-review?query=` (by name) | Google reviews for any place type (hotels, restaurants, attractions). Most places page 10 reviews at a time; some places only have their first 5 reviews (`has_more: false`). A `query` is resolved with Google Maps search (`location` 'lat,lng' biases it). Per review `iso_date_source`: `review` = exact time (best-effort on every page; `likes`/reviewer stats remain page-1-only), `photo` = photo upload hour or day, null = only the relative `date`. `sort_by`: `most_relevant` (default), `newest`, `highest_rating`, `lowest_rating`. `next_page_token` pagination works only on the `data_id` path — capture `data_id` from the first response and pass the token back unchanged with the same `sort_by`. |
+
+REST `GET /v1/google_reviews/reviews-paginated?data_id=&pages=` fetches 1–10 pages in one call; `pages_fetched` can be lower than requested (the pages it got are kept), and while `has_more` is true continue with `/reviews` and the returned `next_page_token`.
 
 This is the Maps place-review surface. For a hotel, `google_travel_reviews` (below) is an alternative with topic/text filters — use it when you already hold an `entity_token`; use this one to answer "Google reviews for X". Reviews can be rating-only (`text: null`), and edited reviews sort by edit time while `iso_date` keeps the original post date.
 
@@ -77,7 +79,7 @@ Deep per-hotel data from Google Travel. Everything keys off an `entity_token` �
 | `google_travel_info` | `GET /v1/google_travel/info` | Identity/metadata: address, coordinates, phone, check-in/out times, website, Maps ids. |
 | `google_travel_photos` | `GET /v1/google_travel/photos` | Photo gallery with dimensions. |
 | `google_travel_prices` | `GET /v1/google_travel/prices` | Nightly rate, usual-price band, partner booking offers. Optional paired `check_in`/`check_out` (YYYY-MM-DD, today/future, checkout later), `adults` 1–10 (default 2); omitted dates use Google defaults. |
-| `google_travel_rooms` | `GET /v1/google_travel/rooms` | Room-level offers per booking site for one stay: each partner's rooms (own names, photos, bed/view features) with per-rate nightly + whole-stay price, `free_cancellation` (+ ISO `free_cancellation_until` when unambiguous), `breakfast_included`; `official` = hotel's own site. Same params/dates as prices; a prices + rooms pair is one upstream fetch. Only partners with a Google sponsored listing have rooms (often 2–4). No offers → no_results. No links: to send the user to a site, use that partner's offer in `google_travel_prices`. |
+| `google_travel_rooms` | `GET /v1/google_travel/rooms` | Room-level offers per booking site for one stay: each partner's rooms (own names, photos, bed/view features) with per-rate nightly + whole-stay price, `free_cancellation` (+ ISO `free_cancellation_until` when unambiguous), `breakfast_included`; `official` = hotel's own site. Same params/dates as prices; calling both with the same parameters is fast. Only partners with a Google sponsored listing have rooms (often 2–4). No offers → no_results. No links: to send the user to a site, use that partner's offer in `google_travel_prices`. |
 | `google_travel_similar` | `GET /v1/google_travel/similar` | Similar hotels + rentals nearby, each with its own token to pivot to. |
 | `google_travel_nearby` | `GET /v1/google_travel/nearby` | Nearby POIs (attractions, transit, airports, restaurants) with drive/walk times. |
 | `google_travel_reviews` | `GET /v1/google_reviews/travel/reviews` | Google-authored reviews: text `query` filter, `topic` (from summary's `topics[].category`), `sort`, token pagination. Exact creation/edit dates are best-effort on every page; unavailable lookups retain photo/null dates. Keep filters identical across pages. |
@@ -98,10 +100,10 @@ Use these for "what's near X / find places like Y / opening hours / phone / is i
 | MCP tool | REST | What it does |
 |---|---|---|
 | `tripadvisor_geo_search` | `GET /v1/tripadvisor/geo-search` | Place name → `geo_id`. First step before area search. |
-| `tripadvisor_search_hotels` | `GET /v1/tripadvisor/search` | Hotels in a `geo_id` area; each carries a `location_id`. |
+| `tripadvisor_search_hotels` | `GET /v1/tripadvisor/search` | Hotels in a `geo_id` area; each carries a `location_id`. Optional `check_in`/`check_out`: both or neither. |
 | `tripadvisor_hotel_details` | `GET /v1/tripadvisor/hotel/details/{location_id}` or `…/hotel/details-from-url?url=` | One hotel's details, including highlighted amenities when available (not a complete list). No `contact.website` or `num_rooms`. URL→ID is instant. |
 | `tripadvisor_hotel_reviews` | `GET /v1/tripadvisor/hotel/reviews/{location_id}` or `…/hotel/reviews-from-url?url=` | Paginated reviews with `language`. At most 20 per page; `per_page` above 20 is treated as 20. |
-| `tripadvisor_hotel_prices` | `GET /v1/tripadvisor/hotel/prices/{location_id}` or `…/hotel/prices-from-url?url=` | Live provider offers (Booking, Agoda, …) for a required stay window. |
+| `tripadvisor_hotel_prices` | `GET /v1/tripadvisor/hotel/prices/{location_id}` or `…/hotel/prices-from-url?url=` | Live provider offers (Booking, Agoda, …) for a required stay window. On search and prices, dates are YYYY-MM-DD, check-out after check-in, check-in not in the past (REST 400, MCP `invalid_input`). |
 
 ## HolidayCheck
 
@@ -115,7 +117,7 @@ guarantee translation.
 | MCP tool | REST | What it does |
 |---|---|---|
 | `holidaycheck_hotels_search` | `GET /v1/holidaycheck/hotels/search` | Hotel-name matches with UUIDs for follow-up calls; `query` is trimmed 1–200 characters, `page` starts at 1, 10/page. `available_count` is provider-returned, not exhaustive. |
-| `holidaycheck_hotel_url_to_id` | `GET /v1/holidaycheck/hotel/url-to-id` | Extract a lowercase hotel UUID from supported `.de`/`.com`/`.at`/`.ch` `hi` or `hr` hotel URL; no upstream fetch. |
+| `holidaycheck_hotel_url_to_id` | `GET /v1/holidaycheck/hotel/url-to-id` | Extract a lowercase hotel UUID from supported `.de`/`.com`/`.at`/`.ch` `hi` or `hr` hotel URL; parsed locally, existence not checked. |
 | `holidaycheck_hotel_details` | `GET /v1/holidaycheck/hotel/details` | Source-grounded property content, contact, descriptions, amenities, check-in/out, and provider summary by UUID. No prices or photo gallery. |
 | `holidaycheck_hotel_reviews` | `GET /v1/holidaycheck/hotel/reviews` | One review page plus provider aggregate by UUID; `page` starts at 1, `sort` is `most_relevant` or `recent_desc`, 10/page. No language, page-size, or owner-response controls. |
 
@@ -125,13 +127,13 @@ Covers Sofitel, Fairmont, Novotel, Ibis, and other Accor brands. Search takes `l
 
 | MCP tool | REST | What it does |
 |---|---|---|
-| `accor_search` | `GET /v1/accor/search` | Properties near coordinates / for a slug, each with its best available offer and `hotel_id`. |
+| `accor_search` | `GET /v1/accor/search` | Properties near coordinates / for a slug, each with its best available offer and `hotel_id`. `radius_km` 1–200 (default 50), `adults` 1–8, `limit` 1–50, `offset` ≥ 0; dates default to today / +1 night. |
 | `accor_hotel_details` | `GET /v1/accor/hotel/details` | Full property content: contact, descriptions, room catalogue, facilities, media. |
 | `accor_hotel_amenities` | `GET /v1/accor/hotel/amenities` | Amenity categories/services with fee + location metadata. |
-| `accor_hotel_reviews` | `GET /v1/accor/hotel/reviews` | Guest reviews + hotel responses — capped at 20 total (upstream limit). |
-| `accor_hotel_rooms` | `GET /v1/accor/hotel/rooms` | Bookable room offers grouped into types with rate plans and policies. |
-| `accor_hotel_photos` | `GET /v1/accor/hotel/photos` | Full photo/video gallery, public URLs at every size. |
-| `accor_price_calendar` | `GET /v1/accor/hotel/price-calendar` | Per-date cheapest offer, window up to 60 days. |
+| `accor_hotel_reviews` | `GET /v1/accor/hotel/reviews` | Guest reviews + hotel responses — capped at 20 total. |
+| `accor_hotel_rooms` | `GET /v1/accor/hotel/rooms` | Bookable room offers grouped into types with rate plans and policies. `adults` 1–8. |
+| `accor_hotel_photos` | `GET /v1/accor/hotel/photos` | Full photo/video gallery, public URLs at every size. Optional `categories` must come from the documented list (e.g. `BEDROOM`, `POOL`); an unknown one is `invalid_input` listing the valid values. |
+| `accor_price_calendar` | `GET /v1/accor/hotel/price-calendar` | Per-date cheapest offer, window up to 60 days; `nights` 1–30, `adults` 1–8, `date_from` not in the past. |
 
 ## Radisson
 
@@ -155,7 +157,7 @@ Brand.com search, live room rates and a per-date price calendar, with Bonvoy awa
 | MCP tool | REST | What it does |
 |---|---|---|
 | `marriott_bonvoy_search` | `GET /v1/marriott/bonvoy/search` | Properties near `latitude`/`longitude` for a stay: `property_id`, brand, rating, distance, lowest cash price, `points_per_night`. 20/page via `offset`; `sort_by` `DISTANCE` or `PRICE`; optional `corporate_code`. Without `corporate_only` a hotel lacking a code rate shows its regular price; `corporate_only=true` (requires `corporate_code`) keeps only hotels with a rate under the code, priced at it. |
-| `marriott_bonvoy_rooms` | `GET /v1/marriott/bonvoy/rooms` | Room types and rate plans for one `property_id` and stay, cash and award. **`points` and `per_night` are the check-in night only** — use `points_total` (whole stay, matches marriott.com) or `total` (cash incl. taxes/fees), or sum `nightly_rates` (one `{date, cash, points, free_night}` per night). A room can list several award plans at different prices; key on `rate_plan_code`. Each rate has `source_of_rate` (`MARSHA` or `ACRS`, Marriott's newer reservation system with its own longer plan/room codes): ACRS rates have empty `nightly_rates` and null `per_night`/`points` on multi-night stays, so use `total`/`points_total`. Unknown property → 404 `PROPERTY_NOT_FOUND` (MCP `no_results`). `UPSTREAM_PROPERTY_REJECTED` (MCP `upstream_error`) means Marriott rejected the code and the second lookup could not complete; retry later. |
+| `marriott_bonvoy_rooms` | `GET /v1/marriott/bonvoy/rooms` | Room types and rate plans for one `property_id` and stay, cash and award. **`points` and `per_night` are the check-in night only** — use `points_total` (whole stay, matches marriott.com) or `total` (cash incl. taxes/fees), or sum `nightly_rates` (one `{date, cash, points, free_night}` per night). A room can list several award plans at different prices; key on `rate_plan_code`. Each rate has `source_of_rate` (`MARSHA` or `ACRS`, Marriott's newer reservation system with its own longer plan/room codes): ACRS rates have empty `nightly_rates` and null `per_night`/`points` on multi-night stays, so use `total`/`points_total`. Unknown property → 404 `PROPERTY_NOT_FOUND` (MCP `no_results`). `UPSTREAM_PROPERTY_REJECTED` (MCP `upstream_error`) means Marriott could not price that code right now; retry later (`marriott_bonvoy_price_calendar` may still price it). |
 | `marriott_bonvoy_price_calendar` | `GET /v1/marriott/bonvoy/price-calendar` | Lowest rate per check-in date for one `property_id`, `date_from`..`date_to` inclusive (≤ 35 days apart, so ≤ 36 dates), each priced for `nights` (1–9). Every date is listed; `available: false` means no rate (prices null). `per_night` = average nightly, `stay_total` = stay, both before taxes/fees, in the property's own currency (no conversion). `corporate_code` returns ONLY rates under the code (unknown code → all dates unavailable). `use_points=true` → `points_total` for the whole stay, cash null; not combinable with `corporate_code`. Unknown property → 404. |
 
 ## Kayak
@@ -218,18 +220,18 @@ Use a MakeMyTrip city code and dated stay for search. Search returns the numeric
 
 ## OpenTable
 
-Restaurant data. Search is coordinate-based — resolve place names with `meta_coordinates_lookup` first.
+Restaurant data. Search is coordinate-based — resolve place names with `meta_coordinates_lookup` first. `time` is 24-hour `HH:MM`; `9:30` is accepted as `09:30`.
 
 | MCP tool | REST | What it does |
 |---|---|---|
-| `opentable_search_restaurants` | `GET /v1/opentable/search` | Restaurants near lat/lng for a date/time/party size. |
+| `opentable_search_restaurants` | `GET /v1/opentable/search` | Restaurants near lat/lng for a date/time/party size. Page with `offset` (+`limit`) until `offset + limit >= total`. |
 | `opentable_restaurant_url_to_id` | `GET /v1/opentable/restaurant/url-to-id` | `/r/{slug}` URL → numeric `restaurant_id` (reads the live page — a few seconds uncached, then cached). |
 | `opentable_restaurant_details` | `GET /v1/opentable/restaurants/{restaurant_id}` | Full normalized profile: identity, hours, photos, feature flags. |
 | `opentable_restaurant_menu` | `GET /v1/opentable/restaurant/menu` | Every published structured menu with items and prices. |
 | `opentable_restaurant_reviews` | `GET /v1/opentable/restaurant/reviews` | Paginated reviews (≤25/page), `newest`/`highest`/`lowest`. |
 | `opentable_restaurant_availability` | `GET /v1/opentable/restaurants/{restaurant_id}/availability` | Is one exact time bookable for date + party size. |
 | `opentable_restaurant_availability_slots` | `GET /v1/opentable/restaurants/{restaurant_id}/availability/slots` | Nearby bookable `HH:MM` slots around a preferred time. |
-| `opentable_private_dining_restaurants` | `GET /v1/opentable/private-dining` | Private-dining venues near lat/lng with capacity and the venue's private-dining page (the event contact's name/phone/email are REST-only); `with_facets=true` reveals cuisine UUID filters. `min_capacity` scans 250 venues per call; if `capacity_filter_truncated`, call again with `scan_offset=next_scan_offset`. |
+| `opentable_private_dining_restaurants` | `GET /v1/opentable/private-dining` | Private-dining venues near lat/lng with capacity and the venue's private-dining page (the event contact's name/phone/email are REST-only); `with_facets=true` reveals cuisine UUID filters. Page with `offset` (+`limit`) until `offset + limit >= total`. `min_capacity` scans 250 venues per call (`total` counts the matches among them); after the last `offset` page, if `capacity_filter_truncated`, call again with `scan_offset=next_scan_offset` and `offset=0`. |
 
 ## Agoda
 
@@ -238,10 +240,10 @@ Restaurant data. Search is coordinate-based — resolve place names with `meta_c
 | `agoda_search_hotels` | `GET /v1/agoda/search` | Dated city_id search (REST alternatively accepts a strict Agoda search URL). Required check_in/check_out, optional occupancy/child ages/currency/page; fixed page_size 10 may return extra cards. Source nightly/stay totals; no inferred has_more. |
 | `agoda_hotel_details` | `GET /v1/agoda/hotel/details?hotel_id=` | Date-free source address, metadata, description, available amenities, photos and useful_information: nullable number_of_rooms (declared total, not availability), year_opened (not construction), check-in/out text and groups [{name,items:[{label,value}]}]. Street can be null. ID 1–2147483647; explicit is_obfuscated masks full/street/coordinates. Resolve name/URL first. Collections not exhaustive; missing hotel is no_results. |
 | `agoda_hotel_lookup` | `GET /v1/agoda/hotel/lookup?query=` | Hotel-name suggestions, optionally including location. Query 2–200 trimmed characters, no controls; select a candidate hotel_id. No pagination, prices, availability, or exhaustive-match guarantee. |
-| `agoda_hotel_url_to_id` | `GET /v1/agoda/hotel/url-to-id` | Agoda hotel URL → numeric `hotel_id`. Costs one quota unit (real page fetch) — cache the id. Use hotel_lookup for names. |
+| `agoda_hotel_url_to_id` | `GET /v1/agoda/hotel/url-to-id` | Agoda hotel URL → numeric `hotel_id`. Costs one quota unit — cache the id. Use hotel_lookup for names. |
 | `agoda_hotel_prices` | `GET /v1/agoda/hotel/prices` | MCP `children_ages`: JSON integer array, up to nine ages 0–17; REST: CSV. Explicit ages override legacy `children` (default age 8); omitted/blank REST retains count, MCP `[]` means no children. Effective occupancy is echoed in `search`. Live dated room availability, lowest whole-stay price, per-night/stay tax breakdowns, breakfast, cancellation, and inventory. A sold-out stay is a successful empty result. |
 | `agoda_hotel_reviews` | `GET /v1/agoda/hotel/reviews/{hotel_id}` | Agoda's own guest reviews only (partner-site reviews such as Booking.com excluded). Up to 20 per page; `sorting`: `7` recent (default), `6` highest, `5` lowest. |
-| `agoda_hotel_review_comments` | `GET /v1/agoda/hotel/reviews/{hotel_id}/comments` | Same Agoda-only reviews and shape via Agoda's ReviewComments API; kept for compatibility. |
+| `agoda_hotel_review_comments` | `GET /v1/agoda/hotel/reviews/{hotel_id}/comments` | Same Agoda-only reviews and shape as `agoda_hotel_reviews`; kept for compatibility. |
 
 `pagination.total_count` is the Agoda-only total; a hotel with none returns `reviews: []` with zeros (REST 200, not `no_results`), while a page Agoda keeps blocking is `upstream_error` (REST 502). English-language reviews come first, then other languages, each group in the requested order, so for a complete date range page until `has_more` is false.
 
@@ -252,7 +254,7 @@ Agoda review responses include nullable `owner_response` objects with nullable `
 | MCP tool | REST | What it does |
 |---|---|---|
 | `tripcom_search_hotels` | `GET /v1/tripcom/hotels/search` | Positive Trip.com `city_id` and required `check_in`/`check_out`; USD default, adults 2/rooms 1 (1–6), limit 10 (1–20). Optional `hotel_name` (trimmed 1–200 characters, no control characters) requests a native name keyword within the required city/stay; returned `hotel_name` is normalized or null. First page only, no children. Nullable `price`: displayed advertised amount has unspecified tax inclusion; use source `total_amount` with its label and `notes` for local charges, never multiply rounded display prices. Returned hotel IDs feed reviews.  Selected-room names/beds/displayed guests/labels and hotel-card context are source descriptions, not policy or capacity guarantees. Crossed-out prices are source values. |
-| `tripcom_hotel_reviews` | `GET /v1/tripcom/hotel/reviews/{hotel_id}` | Paginated reviews (`page_size` 1–50). Per-review `source`: `tripcom`, `ctrip`, `expedia`, `hotelscom`, `tripadvisor`, or `unknown`. Aggregate Expedia ratings do not prove row provenance; upstream credential fields are removed.  `total_reviews` is the hotel aggregate; `pageable_reviews` mirrors `totalCountForPage` for the current feed and does not promise all aggregate rows are retrievable. A positive aggregate with zero pageable rows, or a later out-of-range page, returns an empty successful page. Missing or malformed upstream payloads return an upstream error, not an empty success. |
+| `tripcom_hotel_reviews` | `GET /v1/tripcom/hotel/reviews/{hotel_id}` | Paginated reviews (`page_size` 1–50). Per-review `source`: `tripcom`, `ctrip`, `expedia`, `hotelscom`, `tripadvisor`, or `unknown`. Aggregate Expedia ratings do not prove row provenance. `total_reviews` is the hotel aggregate; `pageable_reviews` mirrors `totalCountForPage` for the current feed and does not promise all aggregate rows are retrievable. A positive aggregate with zero pageable rows, or a later out-of-range page, returns an empty successful page. Missing or malformed upstream payloads return an upstream error, not an empty success. |
 
 Ctrip destination lookup is REST-only: `GET /v1/ctrip/destinations/lookup?query=Hangzhou&country=China`. The optional `country` is an exact English or localized country name. Ambiguous cities return 409 with candidates; regions return 422 with typed municipality suggestions. Supply `country` to help resolve a place within the intended country. Parent-place matches require the original name after case, accent, punctuation and spacing normalization, plus an explicit matching country; similar hotel names and wrong-country places are not substitutes. Exact supported places can return their containing Ctrip search city with `resolution=parent_city`; `name`/`city_id` describe that search city, not necessarily a legal municipality. `matched_place_name`, `matched_place_type`, and nullable `matched_place_id` preserve the matched place on the result and suggestions. Direct city matches, including verified full native aliases such as Sevilla/Seville, take priority over place-parent matches and use `resolution=city` with null matched-place fields. Short-name hierarchy ambiguity stays 409: use the full `Castellón de la Plana` name for city 41132 rather than treating `Castellón` as an unambiguous municipality. Exact cities take precedence over same-name provinces; province errors carry `region_type=province`, `destination_id`, and null `city_id`. Conflicting parent cities remain 409; hotel-only or unmatched names remain 404. Select a verified city ID before hotel search; lowering `limit` does not force a match. `country_en` is the provider-supplied English country name or null on the selected city and suggestions. A 503 `LOOKUP_CAPACITY_EXCEEDED` includes `Retry-After`; wait before retrying. Per-user rate limits remain 429.
 
@@ -279,21 +281,23 @@ Ctrip destination lookup is REST-only: `GET /v1/ctrip/destinations/lookup?query=
 
 ## Quota, billing, and errors
 
-- Billable: every successful data `tools/call` / REST data request — one unit each. Not billed: MCP housekeeping (`initialize`, `tools/list`), the `show_hotels` display tool, and unknown tool names.
+- Billable: every successful data `tools/call` / REST data request, and `no_results` (REST 404) — one unit each. Not billed: the other MCP errors below, requests rejected before the tool runs, MCP housekeeping (`initialize`, `tools/list`), the `show_hotels` display tool, and unknown tool names.
 - REST errors: RFC 7807 `application/problem+json`; only 2xx bodies are data.
 - MCP structured errors and how to react:
 
 | Error | Meaning | Reaction |
 |---|---|---|
 | `invalid_input` | Missing/bad parameter (`field` says which) | Fix the call, don't retry as-is |
-| `url_resolution_failed` | URL didn't yield an id | Check canonical URL format; ask user or try the id path |
-| `upstream_error` | The platform itself errored | Retry once after a few seconds |
+| `url_resolution_failed` | URL didn't yield an id; may carry `outcome`: `not_found`, `unavailable` or `overloaded` | `not_found`: check the URL or ask the user; otherwise retry shortly or pass the id |
+| `upstream_error` | The platform errored, or the tool failed unexpectedly (generic message) | Retry once after a few seconds |
 | `no_results` | Valid query, nothing matched | Report honestly; loosen the query |
-| `rate_limited` | Temporarily overloaded | Back off `retry_after` seconds, retry once or twice |
-| `quota_exhausted` | Monthly quota used up | Stop. Tell the user the `reset_at` time; suggest upgrading |
-| `feature_unavailable` | A requested feature is not built | Offer an alternative supported workflow |
+| `rate_limited` | Temporarily overloaded | Back off `retry_after` seconds when present, retry once or twice |
 
-Auth failures surface as HTTP 401/403 (JSON-RPC `-32001` on MCP) — the key is missing, wrong, or the account is blocked.
+Rejected before the tool runs — a JSON-RPC `error` envelope, not a tool result:
+
+- Missing or invalid key: HTTP 401, code `-32001`. Blocked account: 403, `-32001`.
+- Quota exhausted: HTTP 402, `-32001` with a readable message, `error.data.code` and an upgrade link in `error.data.cta` (free plan or overdue subscription), or HTTP 429, `-32001` with `error.data.code: "quota_exceeded"`, `reset_at` and a `Retry-After` header (paid plan). Stop; tell the user when it resets or suggest upgrading.
+- Request rate exceeded: HTTP 429, code `-32002`, `error.data.retry_after` and `Retry-After`. Wait, then retry.
 
 ## Connecting an MCP client
 
@@ -344,7 +348,7 @@ ChatGPT works in developer mode (web, paid plans): chatgpt.com/plugins → **+**
 | — | `GET /v1/expedia/hotel/lookup?query=&region_id=` | Dateless HOTEL name suggestions in region context; property IDs compose with reviews/rates. Verified no matches return HTTP 200, `properties: []`, `count: 0`; upstream failures remain errors. |
 | — | `GET /v1/expedia/search?region_id=&check_in=&check_out=` | Dated primary cards. Required ordered dates, adults 1–8, offset 0–1000, limit 1–10; USD only. Each card has nullable `price`: `total` (whole stay, taxes/fees included), `currency`, nullable `per_night` (excludes taxes/fees) and `total_before_discount`. Lead search price, not a bookable offer; use rates for offers. Optional filters: `stars=4,5` (1–5), `min_guest_rating` 7/8/9, `sort` recommended/price_low_to_high/price_high_to_low/star_rating/guest_rating, `free_cancellation=true`, `amenities` pool,free_parking,free_breakfast,pets (all must match); echoed in the response, resend them with `next_offset`. With free_cancellation/amenities the price is the matching (refundable/breakfast) rate. |
 | — | `GET /v1/expedia/hotel/details?property_id=` | Undated verified identity and available metadata. The numeric Expedia property URL may redirect. No dates, prices, or availability. Additional nullable metadata: address.region, telephone, image, property_type, room_count, check_in_time/check_out_time and identity-verified structured_data (original property JSON-LD). Independently confirmed missing properties return 404 NOT_FOUND; empty metadata alone or uncertain upstream failures remain 502. |
-| `expedia_hotel_rates` | `GET /v1/expedia/hotel/rates?property_id=&check_in=&check_out=` | Live room offers. MCP `children_ages` is a JSON integer array; REST uses comma-separated ages. Both accept up to six ages from 0–17; omit or use an empty MCP array for adults-only rates. Adults 1–10, ordered nonpast YYYY-MM-DD dates. Currency defaults to USD; other three-letter codes are accepted but conversion is not confirmed. Finite nonnegative priced available inventory or explicit sold-out empties are valid; malformed or contradictory availability is a nonchargeable upstream error. |
+| `expedia_hotel_rates` | `GET /v1/expedia/hotel/rates?property_id=&check_in=&check_out=` | Live room offers. MCP `children_ages` is a JSON integer array; REST uses comma-separated ages. Both accept up to six ages from 0–17; omit or use an empty MCP array for adults-only rates. `property_id` is ASCII digits without a leading zero (also on details/reviews). Adults 1–10, ordered nonpast YYYY-MM-DD dates. Currency defaults to USD; other three-letter codes are accepted but conversion is not confirmed. Finite nonnegative priced available inventory or explicit sold-out empties are valid; malformed or contradictory availability is a nonchargeable upstream error. |
 
 ## Vrbo
 
@@ -373,6 +377,6 @@ not a combined multi-room reservation total. See the public Booking endpoint doc
 
 ### Booking point-of-sale options
 
-`booking_search_hotels` and `booking_hotel_rooms` accept optional ISO `market` (ES: es/EUR; US: en-us/USD), `language`, and `currency`. Explicit display overrides win. Legacy `country_market` retains en-us/USD defaults and must match `market` if both are supplied. Other configured defaults and fallback are documented in the Booking endpoint reference. Compare identical occupancy, stay, currency and room/rate; tax-inclusive versus tax-exclusive headlines are not discounts. `effective_market` reports requested_country, nullable targeted_country, language, currency, country_verified=false and verified_country=null. Targeting is best-effort, not verified geography.
+`booking_search_hotels` and `booking_hotel_rooms` accept optional ISO `market` (ES: es/EUR; US: en-us/USD), `language` (two letters with an optional two-letter region, e.g. `en-us`, `pt-br`; anything else is rejected), and `currency`. Explicit display overrides win. Legacy `country_market` retains en-us/USD defaults and must match `market` if both are supplied. Other configured defaults and fallback are documented in the Booking endpoint reference. Compare identical occupancy, stay, currency and room/rate; tax-inclusive versus tax-exclusive headlines are not discounts. `effective_market` reports requested_country, nullable targeted_country, language, currency, country_verified=false and verified_country=null. Targeting is best-effort, not verified geography.
 
 For Agoda review comments, absent scores serialize as `review_score: null` in REST; the MCP comments result may omit `review_score`. Never infer it from a page.

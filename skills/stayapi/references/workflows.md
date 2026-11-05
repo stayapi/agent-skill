@@ -51,17 +51,17 @@ curl -sS "${AUTH[@]}" "$BASE/v1/booking/search?dest_id=-2167973&dest_type=CITY\
 Key parameters for `/v1/booking/search`:
 
 - `dest_id` (required, **keep the minus sign**), `dest_type` (default `CITY`)
-- `checkin`/`checkout` `YYYY-MM-DD` — optional, but prices need dates
+- `checkin`/`checkout` `YYYY-MM-DD` — omit both for an undated search, but prices need dates; `checkin` alone is one night; `checkout` alone, a past `checkin` or over 90 nights is a 400 (MCP requires both)
 - `adults` (default 2), `children` + `children_ages` ("5,8"), `rooms`
 - `rows_per_page` (1–100, default 25) + `offset` for pagination
-- `currency`, `language`
+- `currency`, `language` (`en-us`, `pt-br`: two letters plus optional two-letter region)
 
 **Reading the search response** — the hotel rows are nested at `data.hotels` (with `data.pagination` beside them), not at the top level. Traps observed in live responses:
 
 - The envelope's top-level `hotel_id` is always `null` on search — per-hotel ids live inside `data.hotels[]`. Hand those to details / rooms / reviews / photos below.
 - `price.amount` is the **total for the whole stay**, not a nightly rate — reporting it as per-night is a silent, high-impact error. It can also carry float artifacts (`439.9400000000001`); show `price.display` or round before presenting.
 - Results arrive in Booking's default "recommended" ranking and there is **no sort parameter**. For "top 3 by price/rating", over-fetch (`rows_per_page` up to 100) and sort client-side — and say which ranking you used.
-- Use `data.pagination.has_next_page` to page; don't quote `total_results` as the destination's inventory (it tracks the requested page size, not the real total).
+- Use `data.pagination.has_next_page` to page. `total_results` is Booking's match count (null if unavailable), but only offsets 0–1000 are served.
 
 ## 2. Hotel details & photos (Booking)
 
@@ -108,7 +108,7 @@ curl -sS "${AUTH[@]}" \
 
 Parameters:
 
-- `page` (from 1) + `per_page` (max 25); response carries `has_next_page`
+- `page` (from 1) + `per_page` (1–25); response carries `has_next_page` (false on an empty page). An unknown `hotel_id` is a 404 (MCP `no_results`)
 - `sort`: default is Booking's "most relevant" ordering; `recent_desc` (newest first), `recent_asc`, `score_desc`, `score_asc`
 - `language`: 2-letter ISO code to filter review language (e.g. `en`)
 - `include_stay_dates=true` adds each review's check-in/out dates
@@ -156,13 +156,13 @@ Details that matter for review requests:
 
 - `sort_by`: `most_relevant` (default), `newest`, `highest_rating`, `lowest_rating`. "Recent reviews" requires `sort_by=newest` — the default is relevance order, which will quietly return old reviews.
 - **Many Google reviews are rating-only** (`text: null`) — a page of 8 may hold only 2–3 with prose. When the user asks for N snippets, keep paginating until you have N with text.
-- **Check `iso_date_source` before trusting `iso_date`.** `review` = Google's exact creation time, attempted on every page by batch lookup; `photo` = photo upload time (not guaranteed creation time), null = only the relative `date`. Upstream failure or an omitted ID can still leave photo/null dates. Do not treat either as an exact creation-date filter; keep paging and explicitly handle unresolved dates in a backfill.
+- **Check `iso_date_source` before trusting `iso_date`.** `review` = Google's exact creation time, best-effort on every page; `photo` = photo upload time (not guaranteed creation time), null = only the relative `date`. Some reviews keep photo/null dates. Do not treat either as an exact creation-date filter; keep paging and explicitly handle unresolved dates in a backfill.
 - **Edited reviews reorder by edit time**, while `iso_date` keeps the *original* post date — a review "edited 6 hours ago" can carry `iso_date: 2018-…`. A paginate-until-cutoff backfill on Google reviews must tolerate these outliers rather than stopping at the first old `iso_date`.
 - **Two Google review surfaces exist**: this one (`google_reviews_for_place`) works for any place type — hotels, restaurants, attractions (paged from Google Travel when it knows the place, else Google Maps' first 5 reviews). `google_travel_reviews` is Google's hotel-only Travel surface (entity_token-keyed, supports topic filters). For a hotel either works: answer "Google reviews for X" with this one; use the travel one when you're already holding an `entity_token` or need topic/text filtering. See [tools.md](tools.md#google-travel).
 
 ## 6. Airbnb destination search, listing details, reviews & calendar
 
-Use destination search when the user needs listings; it is not a property-name lookup. `location` is a city, neighborhood, or postal code (`30308`, `SW1A 1AA`). Each call returns one `page` (1–15, 18 listings) — Airbnb caps a search at ~270 listings. Airbnb URL→ID is an instant regex — passing a URL costs nothing extra.
+Use destination search when the user needs listings; it is not a property-name lookup. `location` is a city, neighborhood, or postal code (`30308`, `SW1A 1AA`). Each call returns one `page` (1–15, 18 listings) — Airbnb caps a search at ~270 listings. Airbnb URL→ID is instant — passing a URL costs nothing extra.
 
 **MCP**: `airbnb_search_listings(location="Paris, France", check_in="2026-10-15", check_out="2026-10-18", adults=2, page=1)`
 
@@ -255,8 +255,7 @@ The rooms response is a quote for exactly that date window and party. `check_in`
 must be today or later in Europe/Istanbul. Preserve provider whole-stay and daily
 price fields separately; there is no requested currency, rate calendar, or
 booking action. Optional `child_ages` is a comma-separated list of up to four
-ages (0–16). The public client uses repeated child-age query keys upstream;
-child-specific live availability has not yet been independently confirmed.
+ages (0–16). Child-specific availability has not yet been independently confirmed.
 
 ## 9. HolidayCheck name → details or reviews
 
