@@ -110,10 +110,10 @@ Parameters:
 
 - `page` (from 1) + `per_page` (1–25); response carries `has_next_page` (false on an empty page). An unknown `hotel_id` is a 404 (MCP `no_results`)
 - `sort`: default is Booking's "most relevant" ordering; `recent_desc` (newest first), `recent_asc`, `score_desc`, `score_asc`
-- `language`: 2-letter ISO code to filter review language (e.g. `en`)
+- `language`: language group (e.g. `en`); regional variants share a group. Omit for all languages.
 - `include_stay_dates=true` adds each review's check-in/out dates
 
-**Date-range backfill pattern** ("all reviews from the last 12 months"): request `sort=recent_desc`, walk `page=1,2,3…` collecting reviews, and stop as soon as a page's oldest `reviewed_date` is older than the cutoff. Relevance order can't do this — only `recent_desc` is chronologically monotonic.
+**Date-range backfill pattern** ("all reviews from the last 12 months"): request `sort=recent_desc`, walk `page=1,2,3…` collecting reviews, and stop as soon as a page's oldest `reviewed_date` is older than the cutoff. Deduplicate by opaque review `id` across pages. Relevance order can change and pages can overlap; do not use it for exhaustive date backfills.
 
 ## 4. Google Travel hotel search
 
