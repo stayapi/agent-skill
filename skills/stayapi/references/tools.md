@@ -380,3 +380,17 @@ not a combined multi-room reservation total. See the public Booking endpoint doc
 `booking_search_hotels` and `booking_hotel_rooms` accept optional ISO `market` (ES: es/EUR; US: en-us/USD), `language` (two letters with an optional two-letter region, e.g. `en-us`, `pt-br`; anything else is rejected), and `currency`. Explicit display overrides win. Legacy `country_market` retains en-us/USD defaults and must match `market` if both are supplied. Other configured defaults and fallback are documented in the Booking endpoint reference. Compare identical occupancy, stay, currency and room/rate; tax-inclusive versus tax-exclusive headlines are not discounts. `effective_market` reports requested_country, nullable targeted_country, language, currency, country_verified=false and verified_country=null. Targeting is best-effort, not verified geography.
 
 For Agoda review comments, absent scores serialize as `review_score: null` in REST; the MCP comments result may omit `review_score`. Never infer it from a page.
+
+### Booking review aggregates (REST only)
+
+Use `/v1/booking/hotel/reviews/summary?hotel_id=` for total reviews, grouped
+languages, up to four traveler categories and up to ten topic counts. Use
+`/v1/booking/hotel/reviews/scores?hotel_id=` for overall/category scores and
+`score_percentage`: five bands [9,10.1), [7,9), [5,7), [3,5), [1,3),
+with labels Wonderful, Good, Okay, Poor, Very Poor and count/whole percent.
+`score_distribution` is removed. Rounded percentages can sum near 100.
+Available nonzero traveler score types are solo_traveller, couple, family, group_of_friends,
+and review_category_business_travellers; business overlaps other groups.
+Unavailable optional category scores are null. Returned nonzero traveler groups have a valid overall score. Zero-review hotels return 200 with total 0,
+empty breakdowns and null overall; nonexistent IDs return 404. There is no
+source selector or dedicated aggregate MCP tool.

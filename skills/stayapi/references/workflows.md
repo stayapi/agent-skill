@@ -351,3 +351,17 @@ For Trip.com search, use `selected_room` as the card's selected offer, not full
 room inventory. Preserve room names, bed text and source labels; displayed
 guests are not capacity. Treat original prices as source crossed-out values,
 and never infer refundability, breakfast or smoking policies from absent labels.
+
+### Booking review aggregates (REST only)
+
+Use `/v1/booking/hotel/reviews/summary?hotel_id=` for total reviews, grouped
+languages, up to four traveler categories and up to ten topic counts. Use
+`/v1/booking/hotel/reviews/scores?hotel_id=` for overall/category scores and
+`score_percentage`: five bands [9,10.1), [7,9), [5,7), [3,5), [1,3),
+with labels Wonderful, Good, Okay, Poor, Very Poor and count/whole percent.
+`score_distribution` is removed. Rounded percentages can sum near 100.
+Available nonzero traveler score types are solo_traveller, couple, family, group_of_friends,
+and review_category_business_travellers; business overlaps other groups.
+Unavailable optional category scores are null. Returned nonzero traveler groups have a valid overall score. Zero-review hotels return 200 with total 0,
+empty breakdowns and null overall; nonexistent IDs return 404. There is no
+source selector or dedicated aggregate MCP tool.
