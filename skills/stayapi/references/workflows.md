@@ -195,7 +195,7 @@ curl -sS "${AUTH[@]}" \
 ```
 
 - `sort_by`: `BEST_QUALITY` (default) or `MOST_RECENT` — use `MOST_RECENT` for backfills, same stop-at-cutoff pattern as Booking.
-- REST also exposes per-listing `pricing`, `calendar`, `cancellation-policy`, and `payment-methods` (same `/v1/airbnb/listing/…` shape) — see https://stayapi.com/docs.
+- REST also exposes per-listing `pricing`, `calendar`, `cancellation-policy`, and `payment-methods` (same `/v1/airbnb/listing/…` shape) — see https://stayapi.com/docs. For dates that cannot be booked, `pricing`, `cancellation-policy` and `payment-methods` return 200 with `available: false` and empty price/policy/payment data — check `available` before reading them.
 
 ## 7. Hilton property → dated cash and full-points rewards
 
