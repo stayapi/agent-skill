@@ -214,10 +214,10 @@ Use a MakeMyTrip city code and dated stay for search. Search returns the numeric
 
 | MCP tool | REST | What it does |
 |---|---|---|
-| `otelpuan_search_hotels` | `GET /v1/otelpuan/search?query=` | Text autocomplete → hotel IDs, names, canonical URLs, and nullable locations. It returns hotel suggestions only and is not exhaustive destination inventory; use its ID directly with `otelpuan_hotel_reviews`. |
-| `otelpuan_hotel_url_to_id` | `GET /v1/otelpuan/hotel/url-to-id?url=` | Full Otelpuan root-slug URL → stable numeric `hotel_id`, identity, page aggregate 0–10 rating, and review count. Query strings and fragments are ignored; nested paths and trailing slashes are invalid. |
-| `otelpuan_hotel_rooms` | `GET /v1/otelpuan/hotel/rooms?url=&check_in=&check_out=&adults=&child_ages=` | Dated room offers by canonical Otelpuan URL; ISO dates, adults 1–10 (default 2), optional comma-separated child ages (0–16, max 4). Whole-stay and per-date provider prices remain separate. No currency selector, calendar, booking action, or numeric-ID input. |
-| `otelpuan_hotel_reviews` | `GET /v1/otelpuan/hotel/reviews?hotel_id=&page=` | Hotel ID → up to 10 reviews per one-based page. Start with `otelpuan_hotel_url_to_id` only when you have a URL, then reuse its ID. The ID-only payload does not include hotel name, URL, or aggregate rating, so those are null. `stay_date` is month-level where supplied; `review_date` is always null because upstream has no publication date. |
+| `otelpuan_search_hotels` | `GET /v1/otelpuan/search?query=` | Hotel-only autocomplete: name, canonical URL, nullable location; no hotel ID. Pass URL to reviews/rooms. |
+| `otelpuan_hotel_url_to_id` | `GET /v1/otelpuan/hotel/url-to-id?url=` | Hotel URL → opaque string hotel_id (changed from legacy numeric namespace), verified name/URL, available-review aggregate rating/count. Reviews and rooms require URLs. |
+| `otelpuan_hotel_rooms` | `GET /v1/otelpuan/hotel/rooms?url=&check_in=&check_out=&adults=&child_ages=` | Dated available room offers by URL and party. Preserve quoted totals and daily prices separately; base/daily tax/payment fields nullable. Cancellation text preserves supplied terms; structured policies can be empty. No booking action. |
+| `otelpuan_hotel_reviews` | `GET /v1/otelpuan/hotel/reviews?url=&page=` | Get available guest reviews by full hotel URL, up to 10 per page, newest stay first. Hotel name and canonical URL are included; hotel/review IDs are absent. Ratings use 0–10; stay_date is YYYY-MM, review_date and title are null. Collection counts may differ from the hotel website. |
 
 ## OpenTable
 

@@ -238,8 +238,9 @@ or malformed availability still fails and follows the normal error policy.
 ## 8. Otelpuan hotel → dated room offers or reviews
 
 Use text autocomplete when the caller has a hotel name. For a dated room quote,
-pass the returned canonical URL directly; do not substitute the numeric review
-ID. For reviews, use the numeric ID from search or URL resolution.
+pass the returned canonical URL directly. Reviews also take the canonical URL;
+URL-to-ID is not a prerequisite. Use `otelpuan_hotel_reviews(url=..., page=1)`
+for up to ten available reviews, newest stay first, without review IDs.
 
 **MCP**: `otelpuan_hotel_rooms(url="https://www.otelpuan.com/Turkler-Otel", check_in="2026-10-10", check_out="2026-10-12", adults=2)`
 
@@ -255,7 +256,7 @@ The rooms response is a quote for exactly that date window and party. `check_in`
 must be today or later in Europe/Istanbul. Preserve provider whole-stay and daily
 price fields separately; there is no requested currency, rate calendar, or
 booking action. Optional `child_ages` is a comma-separated list of up to four
-ages (0–16). Child-specific availability has not yet been independently confirmed.
+ages (0–16). Child ages are sent as supplied, including infants; valid no-availability can return no rooms. Cancellation text preserves terms; unavailable base and daily payment/tax amounts are null.
 
 ## 9. HolidayCheck name → details or reviews
 
