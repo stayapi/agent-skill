@@ -21,4 +21,3 @@ next call. IDs are provider-specific; a search card is not a confirmed booking.
 | HolidayCheck hotel name/URL | `holidaycheck_hotels_search` / `holidaycheck_hotel_url_to_id` | Lowercase UUID. |
 | Marriott property | `marriott_bonvoy_search` by coordinates | `property_id` for rooms. |
 | Hilton URL/place | `hilton_hotel_url_to_id` or `hilton_search` | Seven-character `hotel_code`. |
-| Otelpuan name/URL | `otelpuan_search_hotels` or rooms/url-to-id route | Numeric review ID or canonical rooms URL, depending on operation. |

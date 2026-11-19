@@ -17,7 +17,6 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 - [Kayak](#kayak)
 - [WeHotel (Jin Jiang)](#wehotel-jin-jiang)
 - [MakeMyTrip India](#makemytrip-india)
-- [Otelpuan](#otelpuan)
 - [OpenTable](#opentable)
 - [Agoda](#agoda) · [Trip.com](#tripcom) · [Meta (geocoding)](#meta-geocoding)
 - [Display (ChatGPT hotel cards)](#display-chatgpt-hotel-cards)
@@ -209,15 +208,6 @@ Use a MakeMyTrip city code and dated stay for search. Search returns the numeric
 | `makemytrip_search_hotels` | `GET /v1/makemytrip/search` | Dated India city search. Takes `city_code`, future check-in/check-out, adults, one room, optional child ages, limit, and an opaque cursor. Reuse a cursor only with identical search inputs and limit. |
 | `makemytrip_get_hotel_details` | `GET /v1/makemytrip/hotel/details` | Hotel description, amenities, location, and public photos by numeric `hotel_id` and stay. |
 | `makemytrip_get_hotel_reviews` | `GET /v1/makemytrip/hotel/reviews` | Reviews by numeric `hotel_id`; start with `next_ota=MMT` and continue only while `source_changed` is false and `next_start` is present. |
-
-## Otelpuan
-
-| MCP tool | REST | What it does |
-|---|---|---|
-| `otelpuan_search_hotels` | `GET /v1/otelpuan/search?query=` | Hotel-only autocomplete: name, canonical URL, nullable location; no hotel ID. Pass URL to reviews/rooms. |
-| `otelpuan_hotel_url_to_id` | `GET /v1/otelpuan/hotel/url-to-id?url=` | Hotel URL → opaque string hotel_id (changed from legacy numeric namespace), verified name/URL, available-review aggregate rating/count. Reviews and rooms require URLs. |
-| `otelpuan_hotel_rooms` | `GET /v1/otelpuan/hotel/rooms?url=&check_in=&check_out=&adults=&child_ages=` | Dated available room offers by URL and party. Preserve quoted totals and daily prices separately; base/daily tax/payment fields nullable. Cancellation text preserves supplied terms; structured policies can be empty. No booking action. |
-| `otelpuan_hotel_reviews` | `GET /v1/otelpuan/hotel/reviews?url=&page=` | Get available guest reviews by full hotel URL, up to 10 per page, newest stay first. Hotel name and canonical URL are included; hotel/review IDs are absent. Ratings use 0–10; stay_date is YYYY-MM, review_date and title are null. Collection counts may differ from the hotel website. |
 
 ## OpenTable
 

@@ -19,10 +19,9 @@ Dates in examples are placeholders — always use dates in the future, and pass 
 5. [Google reviews for a place](#5-google-reviews-for-a-place)
 6. [Airbnb destination search, listing details & reviews](#6-airbnb-destination-search-listing-details--reviews)
 7. [Hilton property → dated cash and full-points rewards](#7-hilton-property--dated-cash-and-full-points-rewards)
-8. [Otelpuan hotel → dated room offers or reviews](#8-otelpuan-hotel--dated-room-offers-or-reviews)
-9. [HolidayCheck name → details or reviews](#9-holidaycheck-name--details-or-reviews)
-10. [Marriott flexible dates → cheapest check-in dates](#10-marriott-flexible-dates--cheapest-check-in-dates)
-11. [Kayak city → relative hotel-price calendar](#11-kayak-city--relative-hotel-price-calendar)
+8. [HolidayCheck name → details or reviews](#8-holidaycheck-name--details-or-reviews)
+9. [Marriott flexible dates → cheapest check-in dates](#9-marriott-flexible-dates--cheapest-check-in-dates)
+10. [Kayak city → relative hotel-price calendar](#10-kayak-city--relative-hotel-price-calendar)
 
 ---
 
@@ -235,30 +234,7 @@ the cause is sold out or closed. Offer other dates or
 properties if useful; do not retry the same query as a provider error. Unknown
 or malformed availability still fails and follows the normal error policy.
 
-## 8. Otelpuan hotel → dated room offers or reviews
-
-Use text autocomplete when the caller has a hotel name. For a dated room quote,
-pass the returned canonical URL directly. Reviews also take the canonical URL;
-URL-to-ID is not a prerequisite. Use `otelpuan_hotel_reviews(url=..., page=1)`
-for up to ten available reviews, newest stay first, without review IDs.
-
-**MCP**: `otelpuan_hotel_rooms(url="https://www.otelpuan.com/Turkler-Otel", check_in="2026-10-10", check_out="2026-10-12", adults=2)`
-
-**REST**:
-
-```bash
-curl -sS "${AUTH[@]}" --get "$BASE/v1/otelpuan/hotel/rooms" \
-  --data-urlencode "url=https://www.otelpuan.com/Turkler-Otel" \
-  -d check_in=2026-10-10 -d check_out=2026-10-12 -d adults=2
-```
-
-The rooms response is a quote for exactly that date window and party. `check_in`
-must be today or later in Europe/Istanbul. Preserve provider whole-stay and daily
-price fields separately; there is no requested currency, rate calendar, or
-booking action. Optional `child_ages` is a comma-separated list of up to four
-ages (0–16). Child ages are sent as supplied, including infants; valid no-availability can return no rooms. Cancellation text preserves terms; unavailable base and daily payment/tax amounts are null.
-
-## 9. HolidayCheck name → details or reviews
+## 8. HolidayCheck name → details or reviews
 
 Search by name when the user does not have a UUID. Use the returned `hotel_id`
 directly for details or reviews; the short provider URL returned by search is not
@@ -293,7 +269,7 @@ A supplied `review_date` is HolidayCheck's entry timestamp and `stay_date` is a
 separate month. `original_language` and `language` are source locales, not a
 translation guarantee. Owner replies are not returned.
 
-## 10. Marriott flexible dates → cheapest check-in dates
+## 9. Marriott flexible dates → cheapest check-in dates
 
 Use when the user has a date window rather than fixed dates ("cheapest 3 nights
 in Los Angeles in November with our MMP code"). There is no flexible-dates
@@ -319,7 +295,7 @@ after `date_from`); split longer windows. Rank only `available: true` dates by
 calendar means the property has no rate under it for that window, not an error.
 Each call costs one credit, so budget one per property per window.
 
-## 11. Kayak city → relative hotel-price calendar
+## 10. Kayak city → relative hotel-price calendar
 
 1. Call `kayak_lookup_destination(query="Paris", limit=10)` and choose the intended city using country/region. Preserve its `city_id` string.
 2. Call `kayak_buzz_calendar(city_id="36014")` with the chosen ID.
