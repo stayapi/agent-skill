@@ -199,8 +199,11 @@ curl -sS "${AUTH[@]}" \
 ## 7. Hilton property → dated cash and full-points rewards
 
 Resolve a Hilton URL or search a place, then pass the seven-character
-`hotel_code` to dated rooms. The rooms call has a fixed search party: one room,
-no children, and 1–4 adults. It returns starting cash offers and full-points
+`hotel_code` to dated rooms. Request 1–9 rooms with the same 1–4 adults and
+0–6 children per room; provide every child's age (0–17). Each returned offer
+supports the requested count of one room type and rate plan. `price_basis` is
+`per_room`; cash and points totals are per room, not group totals. Mixed types
+or different parties per room are not combined. It returns starting cash offers and full-points
 standard/premium reward offers. It does not return all cash plans or Points & Money.
 
 **MCP**: `hilton_hotel_url_to_id(url="https://www.hilton.com/en/hotels/lonhitw-hilton-london-park-lane/")` → `hilton_rooms(hotel_code="LONHITW", check_in="2027-11-12", check_out="2027-11-15", adults=2, currency="GBP")`
@@ -229,7 +232,8 @@ Never infer mixed-payment costs or fifth-night benefits.
 Check `availability_status` before interpreting offers. `unavailable` is a
 successful completed query with `room_types: []`, `total: 0`, and an explanatory
 `availability_message`; `native_currency` may be null. Report no availability
-for that stay using the supplied message (no rooms, no rates, or not bookable), without claiming
+for that stay using the supplied message (no rooms, no rates, not bookable, or
+no matching starting cash/points offers for the room count), without claiming
 the cause is sold out or closed. Offer other dates or
 properties if useful; do not retry the same query as a provider error. Unknown
 or malformed availability still fails and follows the normal error policy.
