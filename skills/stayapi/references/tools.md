@@ -385,3 +385,9 @@ and review_category_business_travellers; business overlaps other groups.
 Unavailable optional category scores are null. Returned nonzero traveler groups have a valid overall score. Zero-review hotels return 200 with total 0,
 empty breakdowns and null overall; nonexistent IDs return 404. There is no
 source selector or dedicated aggregate MCP tool.
+
+## Hyatt rooms (REST only)
+
+No MCP tool. `GET /v1/hyatt/rooms` accepts hotel_code, check_in/check_out, adults, rooms, children and repeated child_ages. All prices/points totals are per room; category flags describe returned offers. Limited capacity: honor 503 Retry-After. See the public Hyatt reference.
+
+Hyatt rooms beta returns fresh offers for each requested search; returned category flags do not guarantee exhaustive award inventory.

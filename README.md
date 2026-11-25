@@ -1,6 +1,6 @@
 # StayAPI Agent Skill
 
-An [agent skill](https://docs.claude.com/en/docs/claude-code/skills) that teaches AI assistants to fetch **live hotel, vacation-rental, and restaurant data** through [StayAPI](https://stayapi.com): Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, HolidayCheck (hotel-name search, details, reviews), Accor (ALL), Radisson, Marriott Bonvoy, Hilton, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable.
+An [agent skill](https://docs.claude.com/en/docs/claude-code/skills) that teaches AI assistants to fetch **live hotel, vacation-rental, and restaurant data** through [StayAPI](https://stayapi.com): Booking.com, Airbnb, Google Hotels, Google Travel, Google Reviews, TripAdvisor, Agoda, Trip.com, HolidayCheck (hotel-name search, details, reviews), Accor (ALL), Radisson, Marriott Bonvoy, Hilton, Hyatt (REST rooms beta), WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable.
 
 With the skill installed, prompts like these just work:
 
@@ -9,6 +9,7 @@ With the skill installed, prompts like these just work:
 > *"What do Google reviews say about the Bellagio?"*
 > *"Find Alexa Hotel on HolidayCheck, then get its details and newest reviews"*
 > *"Find Hilton hotels in London and get starting cash room rates for my dates"*
+> *"Get Hyatt room rates for my stay dates"*
 > *"Which OpenTable restaurants near the Eiffel Tower have a table for 4 tonight?"*
 
 The skill guides the assistant to the right StayAPI capability — over the [MCP server](https://stayapi.com/docs/mcp) when connected, or the plain REST API otherwise — and encodes the gotchas that trip up agents (signed destination IDs, stay-total vs nightly prices, per-platform sort parameters, URL-vs-ID resolution costs). HolidayCheck includes hotel-name search, strict URL-to-UUID resolution, property details, and guest reviews.
