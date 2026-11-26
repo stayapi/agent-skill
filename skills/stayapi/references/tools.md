@@ -14,6 +14,7 @@ Every capability, grouped by platform. Each row gives the MCP tool name and the 
 - [Radisson](#radisson)
 - [Marriott Bonvoy](#marriott-bonvoy)
 - [Hilton](#hilton)
+- [Hyatt](#hyatt)
 - [Kayak](#kayak)
 - [WeHotel (Jin Jiang)](#wehotel-jin-jiang)
 - [MakeMyTrip India](#makemytrip-india)
@@ -386,8 +387,14 @@ Unavailable optional category scores are null. Returned nonzero traveler groups 
 empty breakdowns and null overall; nonexistent IDs return 404. There is no
 source selector or dedicated aggregate MCP tool.
 
-## Hyatt rooms (REST only)
+## Hyatt
 
-No MCP tool. `GET /v1/hyatt/rooms` accepts hotel_code, check_in/check_out, adults, rooms, children and repeated child_ages. All prices/points totals are per room; category flags describe returned offers. Limited capacity: honor 503 Retry-After. See the public Hyatt reference.
+| MCP tool | REST | What it does |
+|---|---|---|
+| `hyatt_hotel_url_to_id` | `GET /v1/hyatt/hotel/url-to-id?url=` | Supported canonical HTTPS Hyatt URL → lowercase five-character `hotel_code`, normalized URL, `existence_verified: false`. Does not verify property existence. |
+| `hyatt_hotel_rooms` | `GET /v1/hyatt/rooms` | Dated room offers for `hotel_code`, `check_in`, `check_out`, adults 1–9, rooms 1–2, children 0–4 with one age 0–17 each. Pending release: optional `rate_mode` is `standard` (default) or `awards`; the latter returns quoted offers from the selected response, and the response echoes the mode. Identical occupancy per room; stay 1–30 nights, arrival today or later UTC. |
+| `hyatt_hotel_points_calendar` | `GET /v1/hyatt/points-calendar` | Pending release: fixed one-room `STANDARD_ROOM` points calendar. Required inclusive `start_date`/`end_date` covers 1–31 arrival dates; `nights` 1–30 (default 1), adults 1–9 (default 1), children 0–4 with exact ages. Each day has availability, dated nightly points, their per-room sum, and first-night-only point/tier fields. No cash or P+C. |
+
+REST `child_ages` is repeated; MCP uses an integer array. Cash and points totals are per room. Null cash/tax/points values are unknown, not zero; never reconstruct stay points from nightly points. Awards mode retains award-only rooms and returns quoted offers from the selected response; `cash_available` describes any returned cash offer. Exact verified empty awards results are successful; cash-only or ambiguous awards responses remain Hyatt request failures. The calendar is a fixed standard-room points-only LOS result: `points_total` is the sum of its dated nightly points, while `points`/`points_level` describe the first night only. Category flags and calendar rows are scoped to the selected request, not exhaustive inventory. Limited capacity: honor REST 503 `Retry-After` or MCP `rate_limited.retry_after`. Successful extraction, room results, or calendar results cost one credit; invalid-input/provider failures do not.
 
 Hyatt rooms beta returns fresh offers for each requested search; returned category flags do not guarantee exhaustive award inventory.

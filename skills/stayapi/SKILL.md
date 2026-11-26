@@ -1,8 +1,8 @@
 ---
 name: stayapi
-description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Expedia, Vrbo, Google Hotels, Google Travel, Google Reviews, Google Maps, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, Hyatt (REST rooms beta), Kayak, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable. Use whenever the user wants real hotel prices, availability, room-type catalogs, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data, or Google Maps place search and details (hours, phone, ratings) — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
+description: Fetch live hotel, vacation-rental, and restaurant data through StayAPI (stayapi.com) — Booking.com, Airbnb, Expedia, Vrbo, Google Hotels, Google Travel, Google Reviews, Google Maps, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor, Radisson, Marriott Bonvoy, Hilton, Hyatt (URL resolution and rooms beta), Kayak, WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable. Use whenever the user wants real hotel prices, availability, room-type catalogs, rooms, photos, guest reviews, review backfills or monitoring, destination or property ID lookups, or restaurant search and reservation data, or Google Maps place search and details (hours, phone, ratings) — even if they never mention StayAPI by name. Works through the StayAPI MCP server or plain REST with an API key.
 metadata:
-  version: 0.1.78
+  version: 0.1.79
 ---
 
 # StayAPI — Live Hotel & Travel Data
@@ -27,7 +27,7 @@ Trip.com city/stay search supports an optional hotel-name keyword and up to 20 f
 `tripcom_search_hotels`; see [tool reference](references/tools.md#tripcom).
 
 
-StayAPI is a hosted API that returns live, structured data from the major travel platforms: Booking.com, Airbnb, Expedia, Vrbo, Google Hotels / Google Travel / Google Reviews / Google Maps, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor (ALL), Radisson, Marriott Bonvoy, Hilton, Hyatt (REST rooms beta), WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable. One successful data call or definitive business negative costs one quota unit, on any platform, over either transport. MCP input/provider/protocol failures do not consume quota.
+StayAPI is a hosted API that returns live, structured data from the major travel platforms: Booking.com, Airbnb, Expedia, Vrbo, Google Hotels / Google Travel / Google Reviews / Google Maps, TripAdvisor, Agoda, Trip.com, HolidayCheck, Accor (ALL), Radisson, Marriott Bonvoy, Hilton, Hyatt (URL resolution and rooms beta), WeHotel (Jin Jiang), MakeMyTrip India, and OpenTable. One successful data call or definitive business negative costs one quota unit, on any platform, over either transport. MCP input/provider/protocol failures do not consume quota.
 
 Canonical links:
 
@@ -100,7 +100,7 @@ For dated Agoda city discovery, use `agoda_search_hotels` with a numeric city ID
 
 For rooms, cancellation terms or breakfast at a hotel across booking sites, `google_travel_rooms` (same `entity_token` and stay parameters as `google_travel_prices`) returns each site's rooms and rates; only sites with a Google sponsored listing have room detail.
 
-Everything beyond these — TripAdvisor, Google Travel deep-dives, Google Maps place search and details, Accor, Radisson, Marriott Bonvoy, Hilton, Hyatt (REST rooms beta), Kayak, WeHotel (Jin Jiang), OpenTable, Agoda, Trip.com, room-level rates, price calendars, private dining — is cataloged in [references/tools.md](references/tools.md). Prefer the connected server's discovered schema for MCP calls; use the catalog for REST equivalents and provider-specific constraints.
+Everything beyond these — TripAdvisor, Google Travel deep-dives, Google Maps place search and details, Accor, Radisson, Marriott Bonvoy, Hilton, Hyatt (URL resolution and rooms beta), Kayak, WeHotel (Jin Jiang), OpenTable, Agoda, Trip.com, room-level rates, price calendars, private dining — is cataloged in [references/tools.md](references/tools.md). Prefer the connected server's discovered schema for MCP calls; use the catalog for REST equivalents and provider-specific constraints.
 
 Trip.com/Ctrip review rows may be syndicated. Preserve each review's `source`
 (`tripcom`, `ctrip`, `expedia`, `hotelscom`, `tripadvisor`, or `unknown`); aggregate Expedia
@@ -127,6 +127,6 @@ Airbnb listing IDs: preserve decimal strings end to end. Send MCP `listing_id` a
 
 For Ctrip destination lookup (REST-only), preserve `resolution` and `matched_place_*` provenance. A `parent_city` result returns the containing Ctrip hotel-search city; do not label its ID as the queried resort or assume it is a legal municipality. Conflicting parent cities require selection (409).
 
-Hyatt room offers are REST-only via `/v1/hyatt/rooms`; there is no Hyatt MCP tool. Use the caller-provided five-character hotel code and validated stay/occupancy. Honor 503 Retry-After. Returned category flags are not proof of exhaustive award inventory.
+Use `hyatt_hotel_url_to_id` for a canonical Hyatt URL; `existence_verified: false` means the code is extracted without proving the property exists. Pass that five-character code to `hyatt_hotel_rooms` (REST `/v1/hyatt/rooms`) with validated stay/occupancy. Pending release: use `rate_mode="awards"` for quoted offers from the selected response; default `standard` job behavior is unchanged and the response echoes the selected mode. `cash_available` signals any returned cash offer. Amounts are per room; preserve explicit `points_total` and quoted cash/tax fields, never infer zero or multiply nightly points. An exact verified empty awards result is a valid result; cash-only or ambiguous awards failures do not mean no awards exist. Use `hyatt_hotel_points_calendar` (REST `/v1/hyatt/points-calendar`) only for its fixed one-room standard-room, points-only calendar; it returns dated nightly points and their exact sum, not cash/P+C or broad inventory. Honor 503 Retry-After. Returned category flags are not proof of exhaustive award inventory.
 
 Hyatt rooms beta returns fresh offers for each requested search; returned category flags do not guarantee exhaustive award inventory.

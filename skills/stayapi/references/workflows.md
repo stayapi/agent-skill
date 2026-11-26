@@ -346,3 +346,9 @@ and review_category_business_travellers; business overlaps other groups.
 Unavailable optional category scores are null. Returned nonzero traveler groups have a valid overall score. Zero-review hotels return 200 with total 0,
 empty breakdowns and null overall; nonexistent IDs return 404. There is no
 source selector or dedicated aggregate MCP tool.
+
+## Hyatt URL to dated offers
+
+Resolve a canonical Hyatt hotel URL with `hyatt_hotel_url_to_id(url=...)`, then call `hyatt_hotel_rooms(hotel_code=..., check_in=..., check_out=...)`. For the pending awards filter, add `rate_mode="awards"`; it returns quoted offers from the selected response and echoes the mode. Extraction returns `existence_verified: false`; it does not prove the hotel exists. Supply exact child ages when children travel; occupancy and explicit totals are per room. Preserve `points_total` and quoted cash/tax fields; do not multiply nightly points or turn null into zero. Exact verified empty awards are valid; cash-only or ambiguous awards failures are not no-awards results. Honor `rate_limited.retry_after`, and do not interpret returned cash/award flags as complete inventory. REST equivalents are `/v1/hyatt/hotel/url-to-id` and `/v1/hyatt/rooms`.
+
+For flexible Hyatt points dates, call `hyatt_hotel_points_calendar(hotel_code=..., start_date=..., end_date=..., nights=...)`. It always prices one `STANDARD_ROOM`, one room, and every inclusive arrival date in the requested 1–31-day window. Rank only `available: true` rows by `points_total`, which is the sum of dated `nightly_points`; `points` and `points_level` apply to the first night only. Use `hyatt_hotel_rooms(rate_mode="awards")` for detailed P+C quotes. Do not infer cash/P+C, hotel-wide availability, or account eligibility from the calendar.
